@@ -1,0 +1,328 @@
+@import url("./font.css");
+
+:root {
+    /* Font Families */
+    --font-family-primary: "Roboto";
+    --font-family-secondary: "Montserrat";
+    --font-family-code: "Source Code Pro"
+}
+
+*, *::before, *::after {
+    font: inherit;
+    color: inherit;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family-primary), Arial, Helvetica, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    background-color: #121212;
+    color: #E0E0E0;
+    padding: 32px;
+}
+
+.hidden {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: -1;
+}
+
+.visible {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 0.15s ease;
+}
+
+button {
+    cursor: pointer;
+}
+
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1C1C1C;
+    width: 500px;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.75);
+}
+
+.modal > fieldset {
+    border: none;
+}
+
+.modal > fieldset legend {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.modal label {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal label, .modal textarea {
+    display: block;
+    width: 100%;
+}
+
+.modal textarea {
+    background-color: #333333;
+    border: none;
+    color: inherit;
+    border-radius: 4px;
+    margin: 10px 0 18px 0;
+    padding: 8px;
+}
+
+.modal textarea {
+    resize: none;
+}
+
+.modal .modal-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    column-gap: 8px;
+    margin-top: 24px;
+}
+
+.modal-buttons > button {
+    display: block;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.15s ease;
+}
+
+.modal-button--secondary {
+    background-color: #757575;
+}
+
+.modal-button--primary {
+    background-color: #5A5A5A;
+}
+
+#cancel-task-creation-button:hover, #add-task-button:hover {
+    background-color: #2C2C2C;
+}
+
+.task-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-list-header > h1 {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.add-task-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1C1C1C;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+}
+
+.add-task-button > svg {
+    width: 28px;
+}
+
+.add-task-button:hover {
+    background-color: #2C2C2C;
+}
+
+ul[data-component="/taskmanager"] {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    padding: 16px 0 16px 0;
+}
+
+.task {
+    position: relative;
+    display: block;
+    background-color: #1C1C1C;
+    padding: 12px 16px 12px 28px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease;
+    overflow: hidden;
+}
+
+.task::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    transition: background-color 0.15s ease;
+}
+
+.task.Pending::before {
+    background-color: #4D3B00;
+}
+
+.task.In-progress::before {
+    background-color: #003366;
+}
+
+.task.Completed::before {
+    background-color: #1b3822;
+}
+
+.task:hover {
+    box-shadow: 0 3px 7.5px rgba(0, 0, 0, 0.3);
+}
+
+.task-header, .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 16px;
+}
+
+.task-title {
+    font-size: 24px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 48px);
+}
+
+.task-description {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #C4C4C4;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-remove-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #3A3A3A;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    opacity: 0;
+    border: none;
+    transition: background-color 0.15s ease, opacity 0.125s ease;
+}
+
+.task:hover .task-remove-button {
+    opacity: 1;
+}
+
+.task-remove-button:hover {
+    background-color: #2C2C2C;
+}
+
+.task-remove-button > svg {
+    width: 20px;
+}
+
+.task-status {
+    position: relative;
+    display: flex;
+    border: 1px solid #444444;
+    width: 425px;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+.status-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    border-right: 1px solid #444444;
+    flex: 1;
+    padding: 8px;
+    transition: background-color 0.15s ease;
+}
+
+.status-btn > svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 6px;
+}
+
+.status-btn:nth-of-type(3) {
+    border-right: none;
+}
+
+.status-btn:hover {
+    background-color: #3a3a3a;
+}
+
+.status-btn.active[data-task-status="Pending"] {
+    background-color: #4D3B00;
+    color: #ddc37a;
+}
+
+.status-btn.active[data-task-status="In-progress"] {
+    background-color: #003366;
+    color: #66a3ff;
+}
+
+.status-btn.active[data-task-status="Completed"] {
+    background-color: #1b3822;
+    color: #6dd89c;
+}
+
+.modal-close-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #3A3A3A;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    transition: background-color 0.15s ease, opacity 0.125s ease;
+}
+
+.modal-close-button svg {
+    width: 20px;
+}
+
+@media (max-width: 525px) {
+    .modal {
+        width: 100%;
+    }
+
+    .task-status {
+        width: 100%;
+    }
+
+    .status-btn > svg {
+        margin-right: 0;
+    }
+
+    .status-btn > span {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+    }
+}
