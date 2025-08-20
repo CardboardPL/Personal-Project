@@ -1,0 +1,103 @@
+# Integrated App Project Plan
+This text file will outline the necessary features for specific modules of the integrated app project.
+
+## Task Management Module
+### Purpose:
+- To provide a simple and effective task management system to help users organize and manage their tasks.
+
+### Must-Have Features
+- Create new tasks
+- Update existing tasks
+  - task title
+  - task description
+- Delete tasks
+- Set task statuses (e.g, "Pending", "In-progress", "Completed")
+
+### Additional Features (To be implemented after finishing the core functionality)
+- Add tags to tasks for better organization
+- Add task prioritization (e.g., "High", "Medium", "Low")
+- Add task filters (e.g, by status, tag, priority)
+- Add task searching
+- Support multiple task lists (e.g., "Projects" or "Categories")
+- Add due dates and reminders (after implementing the calendar module)
+- Add drag and drop (after implementing the drag and drop module)
+
+### User flow and Structure
+- Accessing the module:
+  - Users can open the task management module by:
+    1. Clicking a button on the app's dashboard/homepage.
+    2. Directly navigating to the module's URL by typing it into the browser's Address bar.
+- Initial View:
+  - The first screen displayed should be the default Task List View.
+- Creating Tasks:
+  - A "Create Task" button should be accessible from the task list view.
+  - Clicking the button opens a modal where users can enter task details (e.g., "title", "description", "initial status").
+- Updating Tasks:
+  - Clicking on an existing task opens a modal pre-filled with the task’s information.
+  - Users can edit and save updates directly from this modal.
+-  Deleting Tasks:
+  - Hovering over a task reveals a Delete button.
+  - Clicking it removes the task with a confirmation step to avoid accidental deletions.
+- Browsing Tasks:
+  - Users can scroll vertically through the task list to view tasks.
+- Filtering Tasks:
+  - A Filters button should be located in the top-right corner of the Task List View.
+  - Clicking on it opens a dropdown or modal allowing the user to filter tasks by:
+    - Status ("Pending", "In-progress", "Completed")
+    - Tags
+    - Priority
+
+### UI Modules
+These handle what the user sees and interacts with
+- TaskCard - Displays an individual task.
+- TaskListView - Container that renders the full list of tasks.
+- TaskModal - UI for creating and updating a task.
+- FilterMenu - UI for filtering tasks by status, tags, or priority.
+- Sidebar - Navigation Component (can hold links to other modules or sections)
+
+### Functional Modules
+These handle business logic and data management.
+- CRUD logic - Logic for Creating, Reading, Updating, and Deleting of Tasks
+- Data Persistence - Managing how data is stored (e.g., localStorage now, PostgreSQL or API later).
+- State Management - Maintains app's internal state and updates UI components when data changes.
+- Validation - Ensures input data (e.g., "task title", "description") meets the required format before saving.
+- Drag and Drop - Handles reordering tasks through user interaction (to be implemented after core features).
+- Routing - Manages navigation between views or modules based on URL or app state.
+  - Supports direct linking (e.g., typing a module's URL into the browser).
+  - Keeps the UI in sync with the current route.
+  - Enables smooth transitions between modules like the dashboard and task list.
+
+### Tech Stack
+- HTML - For structuring the app's user interface.
+- CSS - For styling and responsive design.
+- JavaScript - For client-side logic, UI interaction, and state management.
+- Node.js (planned) - For backend API and business logic integration in the future.
+- SQL (PostgreSQL) - For data storage and persistence (backend database).
+
+### Milestones
+Milestone 1: Core Task Management
+- Implement CRUD logic (create, read, update, delete)
+- Build TaskListView and TaskCard UI modules
+- Create TaskModal UI for creating/updating tasks
+- Setup basic state management
+- Implement routing to access Task Management module
+
+Milestone 2: Task Status & Basic Filtering
+- Add task statuses and ability to set them
+- Implement FilterMenu UI for filtering by status
+- Add validation for task input fields
+
+Milestone 3: Data Persistence & Backend Setup
+- Integrate localStorage or API for data persistence
+- Setup backend structure with Node.js (planned)
+- Connect frontend with backend data
+
+Milestone 4: Additional Features & UI Enhancements
+- Add tags and task prioritization
+- Enable filtering by tags and priority
+- Add task searching functionality
+- Support multiple task lists (projects/categories)
+
+Milestone 5: Advanced Features
+- Add due dates and reminders (after calendar module)
+- Implement drag and drop for task reordering

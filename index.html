@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>App</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="./styles/styles.css">
+        <script type="module" src="./scripts/app.js" defer></script>
+    </head>
+    <body>
+        <h1 class="visually-hidden js-module-name">Task Manager</h1>
+        <aside class="sidebar">
+
+        </aside>
+        <main>
+            <header class="task-list-header">
+                <h2 class="task-list-name js-task-list-name">Inbox</h2>
+                <button type="button" class="task-create-button js-task-create-button" aria-label="Create Task">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>                      
+                </button>
+            </header>
+            <ul class="task-list" aria-label="Task list for Inbox">
+            </ul>
+        </main>
+
+        <div class="modal-container js-modal-container visually-hidden" role="dialog" aria-hidden="true">
+        </div>
+        <div class="overlay js-overlay visually-hidden" aria-hidden="true"></div>
+    </body>
+</html>
