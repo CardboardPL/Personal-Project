@@ -49,6 +49,8 @@ export class TaskList {
     }
 
     #isValidTaskData(id, taskInfo) {
+        if (!taskInfo) return false;
+
         const taskStatus = taskInfo.status;
         return (
             typeof id === 'number' &&
