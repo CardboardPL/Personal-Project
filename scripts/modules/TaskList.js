@@ -128,7 +128,7 @@ export class TaskList {
         let current = this.taskStore.linkedList.head;
 
         while (current) {
-            const taskId = current.value;
+            const taskId = current.data;
             const taskData = this.retrieveTaskData(taskId);
 
             taskListArr.push(taskId);
@@ -284,7 +284,7 @@ export class TaskList {
     *taskEntries() {
         let current = this.taskStore.linkedList.head;
         while (current) {
-            yield [current.value, this.retrieveTask(current.value).taskData];
+            yield [current.value, this.retrieveTask(current.data).taskData];
             current = current.next;
         }
     }
