@@ -67,8 +67,6 @@ const openCreationFormButtonHandler = () => {
     overlay.addEventListener('click', handleCreationModalClose);
 }
 
-openCreationFormButton.addEventListener('click', openCreationFormButtonHandler);
-
 // Handle Task Editing
 function handleTaskCardClick(e) {
     openCreationFormButton.removeEventListener('click', openCreationFormButtonHandler);
@@ -131,7 +129,6 @@ function handleTaskCardClick(e) {
     overlay.addEventListener('click', handleUpdateModalClose);
 }
 
-taskRenderer.renderTaskList();
 
 // Link up the elements to their respective functions
 document.addEventListener('click', (e) => {
@@ -148,3 +145,7 @@ document.addEventListener('click', (e) => {
         handleTaskCardClick(e);
     }
 });
+
+// do onload functions
+openCreationFormButton.addEventListener('click', openCreationFormButtonHandler);
+taskRenderer.renderTaskList();
