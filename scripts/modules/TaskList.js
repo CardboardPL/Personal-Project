@@ -1,4 +1,4 @@
-import { LinkedList, Node } from './../utility-modules/LinkedList.js';
+import { LinkedList, Node } from './../utility-modules/data-structures/LinkedList.js';
 
 export class TaskList {
     #storageId;
