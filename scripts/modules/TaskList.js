@@ -284,7 +284,7 @@ export class TaskList {
     *taskEntries() {
         let current = this.taskStore.linkedList.head;
         while (current) {
-            yield [current.value, this.retrieveTask(current.data).taskData];
+            yield [current.data, this.retrieveTask(current.data).taskData];
             current = current.next;
         }
     }

@@ -141,7 +141,6 @@ document.addEventListener('click', (e) => {
         list.deleteTask(Number(taskCard.dataset.id));
         taskCard.remove();
     } else if (e.target.closest('.js-task-card')) {
-        console.log('run');
         handleTaskCardClick(e);
     }
 });
