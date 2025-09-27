@@ -1,8 +1,8 @@
 'use strict';
 
-import { TaskList } from '../src/modules/TaskList.js';
-import { setup as modalSetup } from '../src/modules/TaskModal.js';
-import { TaskRenderer } from '../src/modules/TaskRenderer.js';
+import { TaskList } from '../src/modules/task-manager/TaskList.js';
+import { setup as modalSetup } from '../src/modules/task-manager/TaskModal.js';
+import { TaskRenderer } from '../src/modules/task-manager/TaskRenderer.js';
 
 // Initialize the Task List and Task Renderer
 const list = new TaskList('1234');

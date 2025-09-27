@@ -1,4 +1,4 @@
-import { escapeHTML } from '../utility-modules/sanitize.js';
+import { escapeHTML } from '../../utility-modules/sanitize.js';
 
 export class TaskRenderer {
     #taskListId;
