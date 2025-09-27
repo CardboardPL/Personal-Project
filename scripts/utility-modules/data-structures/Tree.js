@@ -5,10 +5,17 @@ export class Tree {
     #counter;
     #map;
 
-    constructor(root, counter) {
+    constructor(root) {
         this.root = root;
-        this.#counter = counter || 0;
+        this.#counter = 0;
         this.#map = new Map();
+
+        if (this.root) {
+            if (!this.root.data || this.root.data.id == null || typeof this.root.data.id !== 'number') throw new Error('Invalid root node: missing id');
+            const rootId = this.root.data.id;
+            this.#counter = rootId + 1;
+            this.#map.set(rootId, this.root);
+        }
     }
 
     #generateId() {
@@ -140,7 +147,7 @@ export class Tree {
     }
 }
 
-class TreeNode {
+export class TreeNode {
     constructor(parent, data) {
         this.parent = parent;
         this.data = data;
