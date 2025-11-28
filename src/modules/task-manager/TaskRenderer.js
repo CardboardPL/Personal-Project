@@ -1,4 +1,5 @@
 import { escapeHTML } from '../../utils/sanitize.js';
+import { TaskList } from './TaskList.js';
 
 export class TaskRenderer {
     #taskListId;
@@ -69,5 +70,11 @@ export class TaskRenderer {
 
         // Update Task Card Description
         taskCard.querySelector('.js-card-description').textContent = taskInfo.description;
+    }
+
+    switchTaskList(newTaskList) {
+        if (!(newTaskList instanceof TaskList)) throw new Error('The new TaskList must be a valid TaskList instance.');
+        if (newTaskList === this.#taskList) return;
+        this.#taskList = newTaskList;
     }
 }
