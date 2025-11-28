@@ -242,20 +242,20 @@ export class TaskList {
         return hasChanged;
     }
 
-        deleteTask(id) {
-            const task = this.taskStore.map.get(id);
+    deleteTask(id) {
+        const task = this.taskStore.map.get(id);
 
-            if (!task) {
-                throw new Error(`Task deletion process aborted. Provide a valid integer id to delete a task. ID: ${id}, doesn't exist in the registry.`);
-            }
-
-            // Delete from the linked list
-            this.taskStore.linkedList.removeNode(task.node);
-            // Delete from the Map
-            this.taskStore.map.delete(id);
-
-            this.#saveTaskList();
+        if (!task) {
+            throw new Error(`Task deletion process aborted. Provide a valid integer id to delete a task. ID: ${id}, doesn't exist in the registry.`);
         }
+
+        // Delete from the linked list
+        this.taskStore.linkedList.removeNode(task.node);
+        // Delete from the Map
+        this.taskStore.map.delete(id);
+
+        this.#saveTaskList();
+    }
 
     verifyDataIntegrity(removeMismatches = false) {
         const taskMapSize = this.taskStore.map.size;
