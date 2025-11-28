@@ -100,17 +100,19 @@ export class TaskList {
         if (typeof title !== 'string') {
             throw new Error(`${process} process aborted. Provided title must be of type "string".`);
         }
+        const cleanedTitle = title.trim();
+        if (!cleanedTitle) {
+            throw new Error(`${process} process aborted. Provided a non-empty title.`);
+        }
+
         if (typeof description !== 'string') {
             throw new Error(`${process} process aborted. Provided description must be of type "string".`);
         }
-    }
 
-    #cleanAndValidateTitle(process, title) {
-        const cleanedTitle = title.trim();
-        if (cleanedTitle === '') {
-            throw new Error(`${process} process aborted. Provide a non-empty title to proceed.`);
-        }
-        return cleanedTitle;
+        return {
+            validatedTitle: cleanedTitle,
+            validatedDescription: description.trim(),
+        };
     }
 
     #retrieveTaskList() {
@@ -150,11 +152,10 @@ export class TaskList {
 
     createTask(title, description = '', initialStatus = 0) {
         // Input Validation
-        this.#validateTaskData('Task creation', title, description, initialStatus);
-        const cleanedTitle = this.#cleanAndValidateTitle('Task creation', title);
+        const { validatedTitle, validatedDescription } = this.#validateTaskData('Task creation', title, description, initialStatus);
 
         const taskId = this.#createTaskId();
-        const newTask = new Task(cleanedTitle, description.trim(), initialStatus);
+        const newTask = new Task(validatedTitle, validatedDescription, initialStatus);
         const taskNode = new Node(null, null, taskId);
         this.taskStore.map.set(taskId, {
             taskData: newTask,
@@ -218,18 +219,16 @@ export class TaskList {
 
         task = task.taskData;
 
-        this.#validateTaskData('Task update', title, description, status);
-        const cleanedTitle = this.#cleanAndValidateTitle('Task update', title);
-        const cleanedDescription = description.trim();
+        const { validatedTitle, validatedDescription } = this.#validateTaskData('Task update', title, description, status);
 
         let hasChanged = false;
-        if (task.title !== cleanedTitle) {
-            task.title = cleanedTitle;
+        if (task.title !== validatedTitle) {
+            task.title = validatedTitle;
             hasChanged = true;
         }
 
-        if (task.description !== cleanedDescription) {
-            task.description = cleanedDescription;
+        if (task.description !== validatedDescription) {
+            task.description = validatedDescription;
             hasChanged = true;
         }
 
