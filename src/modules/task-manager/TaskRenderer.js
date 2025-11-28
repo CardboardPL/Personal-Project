@@ -1,4 +1,4 @@
-import { escapeHTML } from '../../utility-modules/sanitize.js';
+import { escapeHTML } from '../../utils/sanitize.js';
 
 export class TaskRenderer {
     #taskListId;
@@ -65,9 +65,9 @@ export class TaskRenderer {
         const taskCard = document.querySelector(`.js-task-card[data-id="${id}"]`);
         
         // Update Task Card Title
-        taskCard.querySelector('.js-card-title').innerText = taskInfo.title;
+        taskCard.querySelector('.js-card-title').textContent = taskInfo.title;
 
         // Update Task Card Description
-        taskCard.querySelector('.js-card-description').innerText = taskInfo.description;
+        taskCard.querySelector('.js-card-description').textContent = taskInfo.description;
     }
 }
