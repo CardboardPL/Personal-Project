@@ -30,7 +30,7 @@ export class Tree {
         }
 
         if (node) {
-            if (!node.data || !node.data.id) throw new Error('Aborted Insert Node Process: Passed an invalid node');
+            if (!node.data || (!node.data.id && node.data.id !== 0)) throw new Error('Aborted Insert Node Process: Passed an invalid node');
             if (!this.retrieveNode(node.data.id)) throw new Error('Aborted Insert Node Process: Node doesn\'t exist in the current tree');
         }
 
