@@ -4,25 +4,58 @@ import { Queue } from './Queue.js';
 export class Tree {
     #counter;
     #map;
+    #idGenerator;
+    #enableIdGeneration;
 
-    constructor(root) {
+    constructor(root, enableIdGeneration = true, idGenerator) {
         this.root = root;
         this.#counter = 0;
         this.#map = new Map();
+        this.#enableIdGeneration = enableIdGeneration;
 
         if (this.root) {
-            if (!this.root.data || this.root.data.id == null || typeof this.root.data.id !== 'number') throw new Error('Invalid root node: missing id');
+            if (!this.root.data || this.root.data.id == null || (this.#enableIdGeneration && !idGenerator && typeof this.root.data.id !== 'number')) throw new Error('Invalid root node: missing id');
             const rootId = this.root.data.id;
-            this.#counter = rootId + 1;
+            if (this.#enableIdGeneration && !idGenerator) {
+                this.#counter = rootId + 1;
+            }
             this.#map.set(rootId, this.root);
+        }
+
+        if (this.#enableIdGeneration) {
+            if (idGenerator != null && typeof idGenerator !== 'function') throw new Error('Invalid idGenerator: it must either be undefined/null to use the default ID generator or a function for custom ID generators');
+            this.#idGenerator = idGenerator || (() => this.#counter++);
         }
     }
 
-    #generateId() {
-        return this.#counter++;
+    #generateId(id) {
+        let mapId;
+
+        if (this.#enableIdGeneration) {
+            mapId = this.#idGenerator();
+        } else if (typeof id === 'string') {
+            mapId = id.trim();
+            if (!mapId) throw new Error('Passed an empty ID.');
+        } else if (typeof id === 'number') {
+            mapId = id;
+        } else {
+            throw new Error('Passed an invalid ID.');
+        }
+
+        if (this.#map.has(mapId)) throw new Error('Passed an existing id');
+
+        return mapId;
     }
 
-    insertParentAbove(node, data) {
+    #createNewNode(id, data) {
+        const newNode = new Node(null, null, {
+            id, data: new TreeNode(data)
+        });
+        this.#map.set(id, newNode);
+        return newNode;
+    }
+
+    insertParentAbove(node, data, id) {
         if (this.root && !node) {
             throw new Error('Aborted Insert Node Process: Cannot insert before a null node when the tree already has a root.');
         } else if (this.root === node) {
@@ -34,17 +67,8 @@ export class Tree {
             if (!this.retrieveNode(node.data.id)) throw new Error('Aborted Insert Node Process: Node doesn\'t exist in the current tree');
         }
 
-        const id = this.#generateId();
-
-        if (this.#map.has(id)) {
-            throw new Error('Aborted Insert Node Process: Passed an existing id');
-        }
-
-        const newNode = new Node(null, null, {
-            id, data: new TreeNode(null, data)
-        });
-
-        this.#map.set(id, newNode);
+        let mapId = this.#generateId(id);
+        const newNode = this.#createNewNode(mapId, data);
         if (!this.root && node == null) {
             this.root = newNode;   
         } else {
@@ -67,10 +91,10 @@ export class Tree {
             node.data.data.parent = newNode;
         }
     
-        return id;
+        return mapId;
     }
 
-    appendChild(parent, data) {
+    appendChild(parent, data, id) {
         if (this.root && parent == null) {
             throw new Error('Aborted Append Child Process: You can only create one root node');
         }
@@ -80,25 +104,16 @@ export class Tree {
             if (!this.retrieveNode(parent.data.id)) throw new Error('Aborted Append Child Process: Node doesn\'t exist in the current tree');
         }
         
-        const id = this.#generateId();
-
-        if (this.#map.has(id)) {
-            throw new Error('Aborted Insert Node Process: Passed an existing id');
-        }
-
-        const newNode = new Node(null, null, {
-            id, data: new TreeNode(parent, data)
-        });
-
-        this.#map.set(id, newNode);
+        const mapId = this.#generateId(id);
+        const newNode = this.#createNewNode(mapId, data);
         if (!this.root && parent == null) {
             this.root = newNode;
-            return id;
+            return mapId;
         }
 
         // Node -> Node.data (TreeNode) -> TreeNode.data
         parent.data.data.children.appendNode(newNode);
-        return id;
+        return mapId;
     }
 
     deleteSubtree(nodeId) {
