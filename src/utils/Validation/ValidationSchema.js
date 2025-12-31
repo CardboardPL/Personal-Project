@@ -1,5 +1,4 @@
 import { Queue } from './../../data-structures/Queue.js';
-import { Node } from './../../data-structures/LinkedList.js';
 import { SchemaField } from './SchemaField.js';
 
 export class ValidationSchema {
@@ -24,33 +23,39 @@ export class ValidationSchema {
         this.#validateSchema(this.#schema.data);
     }
 
-    #checkForCircularReferences(startRef) {
+    #checkForCircularReferences() {
         const set = new Set();
 
-        const queue = new Queue().enqueue(new Node(null, null, startRef));
+        const queue = new Queue().enqueue(this);
 
         while (queue.queueSize()) {
-            const currVal = queue.dequeue().data;
+            const currVal = queue.dequeue();
 
             if (set.has(currVal)) {
                 throw new Error('Invalid Schema: Circular references detected.');
             }
+            set.add(currVal);
 
             if (currVal instanceof ValidationSchema) {
                 for (const schema of [...currVal.getConnectedSchemas()]) {
-                    queue.enqueue(new Node(null, null, schema));
+                    queue.enqueue(schema);
                 }
             }
         }
     }
 
     #validateSchema(schema) {
-        const schemaList = new Queue().enqueue(new Node(null, null, {
-            depth: 0,
-            schema: new Node(null, null, schema)
-        }));
+        const schemaList = new Queue();
+
+        if (schema) {
+            schemaList.enqueue({
+                depth: 0,
+                schema
+            });
+        }
+
         while (schemaList.queueSize()) {
-            const currSchemaData = schemaList.dequeue().data;
+            const currSchemaData = schemaList.dequeue();
             const [currSchemaDepth, currSchema] = [currSchema.depth, currSchemaData.schema];
             this.#connectedSchemas.add(currSchema);
 
@@ -73,15 +78,15 @@ export class ValidationSchema {
                         throw new Error(`Invalid Schema: Reached maximum schema depth of ${currSchemaDepth}.`);
                     }
 
-                    schemaList.enqueue(new Node({
+                    schemaList.enqueue({
                         depth: currSchemaDepth + 1,
                         schema: currValue
-                    }));
+                    });
                 }
             }
         }
 
-        this.#checkForCircularReferences(this);
+        this.#checkForCircularReferences();
     }
 
     #validateObject(schema, schemaData, breakOnFailure) {
