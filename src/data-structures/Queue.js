@@ -7,18 +7,17 @@ export class Queue {
         this.#linkedList = linkedList instanceof LinkedList ? linkedList : new LinkedList();
     }
 
-    enqueue(node) {
-        if (!(node instanceof Node)) throw new Error('Aborted Enqueue process: Passed an invalid node');
-
+    enqueue(data) {
+        const node = new Node(null, null, data);
         this.#linkedList.appendNode(node);
     }
 
     dequeue() {
-        return this.#linkedList.removeNode(this.#linkedList.peekHead());
+        return this.#linkedList.removeNode(this.#linkedList.peekHead()).data;
     }
 
     peek() {
-        return this.#linkedList.peekHead();
+        return this.#linkedList.peekHead().data;
     }
 
     queueSize() {
