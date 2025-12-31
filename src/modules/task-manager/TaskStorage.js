@@ -1,4 +1,3 @@
-import { Node } from './../../data-structures/LinkedList.js';
 import { Queue } from './../../data-structures/Queue.js';
 import { Tree } from './../../data-structures/Tree.js';
 
@@ -43,14 +42,14 @@ export class TaskStorage {
         // Represent the raw data in the tree
         const queue = new Queue();
         if (rawData.length > 0) {
-            queue.enqueue(new Node(null, null, {
+            queue.enqueue({
                 parentId: null,
                 data: rawData[0]
-            }));
+            });
         }
 
         while (queue.queueSize()) {
-            const { parentId, data } = queue.dequeue().data;
+            const { parentId, data } = queue.dequeue();
             const currNodeParent = this.#taskTree.retrieveNode(parentId);
             const { globalId, taskData, children } = data;
 
@@ -60,10 +59,10 @@ export class TaskStorage {
             this.#taskTree.appendChild(currNodeParent, taskData, globalId);
 
             for (const child of children) {
-                queue.enqueue(new Node(null, null, {
+                queue.enqueue({
                     parentId: globalId,
                     data: child
-                }));
+                });
             }
         }
     }
