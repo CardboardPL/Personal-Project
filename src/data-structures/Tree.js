@@ -2,29 +2,27 @@ import { LinkedList, Node } from './LinkedList.js';
 import { Queue } from './Queue.js';
 
 export class Tree {
+    #root
     #counter;
     #map;
     #idGenerator;
     #enableIdGeneration;
 
-    constructor(root, enableIdGeneration = true, idGenerator) {
-        this.root = root;
+    constructor(rootConfig, enableIdGeneration = true, idGenerator) {
         this.#counter = 0;
         this.#map = new Map();
         this.#enableIdGeneration = enableIdGeneration;
 
-        if (this.root) {
-            if (!this.root.data || this.root.data.id == null || (this.#enableIdGeneration && !idGenerator && typeof this.root.data.id !== 'number')) throw new Error('Invalid root node: missing id');
-            const rootId = this.root.data.id;
-            if (this.#enableIdGeneration && !idGenerator) {
-                this.#counter = rootId + 1;
-            }
-            this.#map.set(rootId, this.root);
-        }
-
         if (this.#enableIdGeneration) {
             if (idGenerator != null && typeof idGenerator !== 'function') throw new Error('Invalid idGenerator: it must either be undefined/null to use the default ID generator or a function for custom ID generators');
             this.#idGenerator = idGenerator || (() => this.#counter++);
+        }
+
+        if (rootConfig) {
+            const { id : rootId, data : rootData = null } = rootConfig;
+            this.#root = this.#createNewNode(this.#generateId(rootId), rootData);
+        } else {
+            this.#root = null;
         }
     }
 
@@ -74,9 +72,9 @@ export class Tree {
 
     // The id parameter for insertParentAbove and appendChild allows the user to pass in custom ids when id generation is disabled.
     insertParentAbove(descendantNodeId, data, id) {
-        if (this.root && !descendantNodeId) {
+        if (this.#root && !descendantNodeId) {
             throw new Error('Aborted Insert Node Process: Cannot insert before a null node when the tree already has a root.');
-        } else if (this.root.data.id === descendantNodeId) {
+        } else if (this.#root.data.id === descendantNodeId) {
             throw new Error('Aborted Insert Node Process: Cannot insert before the root node.');
         }
 
@@ -85,8 +83,8 @@ export class Tree {
 
         let mapId = this.#generateId(id);
         const newNode = this.#createNewNode(mapId, data);
-        if (!this.root && descendantNode == null) {
-            this.root = newNode;
+        if (!this.#root && descendantNode == null) {
+            this.#root = newNode;
         } else {
             // Node -> Node.data (TreeNode) ->  TreeNode.data
 
@@ -111,7 +109,7 @@ export class Tree {
     }
 
     appendChild(parentNodeId, data, id) {
-        if (this.root && parentNodeId == null) {
+        if (this.#root && parentNodeId == null) {
             throw new Error('Aborted Append Child Process: You can only create one root node');
         }
 
@@ -120,8 +118,8 @@ export class Tree {
         
         const mapId = this.#generateId(id);
         const newNode = this.#createNewNode(mapId, data);
-        if (!this.root && parentNode == null) {
-            this.root = newNode;
+        if (!this.#root && parentNode == null) {
+            this.#root = newNode;
             return mapId;
         }
 
@@ -166,8 +164,8 @@ export class Tree {
         const node = this.#retrieveNode(nodeId);
         if (!node) throw new Error('Aborted Subtree Deletion Process: Node doesn\'t exist in the tree.');
 
-        if (this.root === node) {
-            this.root = null;
+        if (this.#root === node) {
+            this.#root = null;
         } else if (node.data.data.parent) {
             // Remove node from its parent's children list
             node.data.data.parent.data.data.children.removeNode(node);
