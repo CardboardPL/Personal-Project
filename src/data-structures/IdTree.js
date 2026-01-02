@@ -1,7 +1,7 @@
 import { LinkedList, Node } from './LinkedList.js';
 import { Queue } from './Queue.js';
 
-export class Tree {
+export class IdTree {
     #root
     #counter;
     #map;
@@ -47,7 +47,7 @@ export class Tree {
 
     #createNewNode(id, data) {
         const newNode = new Node(null, null, {
-            id, data: new TreeNode(data)
+            id, data: new IdTreeNode(data)
         });
         this.#map.set(id, newNode);
         return newNode;
@@ -182,7 +182,7 @@ export class Tree {
     }
 }
 
-export class TreeNode {
+class IdTreeNode {
     constructor(parent, data) {
         this.parent = parent;
         this.data = data;

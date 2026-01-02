@@ -1,5 +1,5 @@
 import { Queue } from './../../data-structures/Queue.js';
-import { Tree } from './../../data-structures/Tree.js';
+import { IdTree } from './../../data-structures/IdTree.js';
 
 export class TaskStorage {
     #storageId;
@@ -16,7 +16,7 @@ export class TaskStorage {
         }
 
         this.#storageId = storageId;
-        this.#taskTree = new Tree(null, false);
+        this.#taskTree = new IdTree(null, false);
         this.#getFromStorage();
     }
 
