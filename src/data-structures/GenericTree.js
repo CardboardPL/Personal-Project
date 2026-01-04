@@ -21,6 +21,15 @@ export class GenericTree {
         }
         return this.#useLinkedList ? parentNode.children.appendNode(new Node(null, null, node)) : node;
     }
+
+    removeChild(parentNode, node) {
+        if (!this.#useLinkedList) {
+            parentNode.children = parentNode.children.filter((val) => val !== node);
+        } else {
+            parentNode.children.removeNode(node);
+        }
+        return this.#useLinkedList ? parentNode.children.size() : parentNode.children.length;
+    }
 }
 
 class GenericTreeNode {
