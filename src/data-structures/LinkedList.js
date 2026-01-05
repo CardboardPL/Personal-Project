@@ -66,7 +66,7 @@ export class LinkedList {
         return node;
     }
 
-    insertNode(nodePrev, nodeNext, node) {
+    splice(nodePrev, nodeNext, node) {
         if (!nodePrev) {
             this.head = node;
             node.prev = null;
@@ -117,25 +117,18 @@ export class LinkedList {
         return node;
     }
 
-    removeNode(node) {
+    removeNode(node, assumeIntegrity = true) {
         if (!node) return null;
 
-        if (!node.prev) {
-            if (node.next) {
-                this.head = node.next;
-                this.head.prev = null;
-            } else {
-                this.tail = null;
-                this.head = null;
-            }
-        } else if (!node.next) {
-            if (node.prev) {
-                this.tail = node.prev;
-                this.tail.next = null;
-            } else {
-                this.tail = null;
-                this.head = null;
-            }
+        if (!node.prev && node.next) {
+            this.head = node.next;
+            this.head.prev = null;
+        } else if (!node.prev && !node.next) {
+            this.tail = null;
+            this.head = null;
+        } else if (!node.next && node.prev) {
+            this.tail = this.tail.prev;
+            this.tail.next = null;
         } else {
             node.prev.next = node.next;
             node.next.prev = node.prev;
@@ -144,7 +137,7 @@ export class LinkedList {
         node.prev = null;
         node.next = null;
 
-        this.#length = this.#countItems();
+        this.#length = assumeIntegrity ? this.#length - 1 : this.#countItems();
         return node;
     }
 

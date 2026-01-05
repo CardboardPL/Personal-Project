@@ -92,7 +92,7 @@ export class IdTree {
             newNode.data.data.parent = descendantNode.data.data.parent;
 
             // Replace the original node in the children list of the parent node
-            descendantNode.data.data.parent.data.data.children.insertNode(descendantNode.prev, descendantNode.next, newNode);
+            descendantNode.data.data.parent.data.data.children.splice(descendantNode.prev, descendantNode.next, newNode);
 
             // Reset original node connections
             descendantNode.prev = null;
