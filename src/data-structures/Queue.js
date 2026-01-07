@@ -1,20 +1,20 @@
-import { LinkedList, Node } from './LinkedList.js';
+import { SinglyLinkedList, SNode } from './SinglyLinkedList.js';
 
 export class Queue {
     #linkedList;
 
     constructor(linkedList) {
-        this.#linkedList = linkedList instanceof LinkedList ? linkedList : new LinkedList();
+        this.#linkedList = linkedList instanceof SinglyLinkedList ? linkedList : new SinglyLinkedList();
     }
 
     enqueue(data) {
-        const node = new Node(null, null, data);
+        const node = new SNode(null, data);
         this.#linkedList.appendNode(node);
     }
 
     dequeue() {
         if (!this.queueSize()) return null; 
-        return this.#linkedList.removeNode(this.#linkedList.peekHead()).data;
+        return this.#linkedList.removeHead().data;
     }
 
     peek() {
