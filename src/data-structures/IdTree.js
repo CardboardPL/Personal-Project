@@ -60,9 +60,9 @@ export class IdTree {
         const toProcess = new Queue();
         this.#map.delete(startNode.id);
         toProcess.enqueue(startNode);
-        
-        while (toProcess.queueSize()) {
-            for (const child of toProcess.dequeue().children) {
+
+        for (const node of toProcess.consume()) {
+            for (const child of node.children) {
                 this.#map.delete(child.id);
                 toProcess.enqueue(child);
             }
