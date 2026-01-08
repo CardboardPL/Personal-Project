@@ -19,7 +19,7 @@ export class GenericTree {
         if (!this.#useLinkedList) {
             parentNode.children.push(node);
         }
-        return this.#useLinkedList ? parentNode.children.appendNode(new Node(null, null, node)) : node;
+        return this.#useLinkedList ? parentNode.children.appendNode(new Node(node)) : node;
     }
 
     removeChild(parentNode, node) {
