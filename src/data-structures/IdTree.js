@@ -20,7 +20,7 @@ export class IdTree {
 
         if (rootConfig) {
             const { id : rootId, data : rootData = null } = rootConfig;
-            this.#root = this.#createNewNode(null, null, rootData, this.#generateId(rootId), null);
+            this.#root = this.#createNewNode(rootData, this.#generateId(rootId), null);
         } else {
             this.#root = null;
         }
@@ -46,8 +46,8 @@ export class IdTree {
         return mapId;
     }
 
-    #createNewNode(prev, next, data, id, parent) {
-        const newNode = new IdTreeNode(prev, next, data, id, parent);
+    #createNewNode(data, id, parent) {
+        const newNode = new IdTreeNode(data, id, parent);
         this.#map.set(id, newNode);
         return newNode;
     }
@@ -81,7 +81,7 @@ export class IdTree {
         if (descendantNodeId != null && !descendantNode) throw new Error('Aborted Insert Node Process: Descendant Node doesn\'t exist in the current tree');
 
         let mapId = this.#generateId(id);
-        const newNode = this.#createNewNode(null, null, data, id, null);
+        const newNode = this.#createNewNode(data, id, null);
         if (!this.#root && descendantNode == null) {
             this.#root = newNode;
         } else {
@@ -114,7 +114,7 @@ export class IdTree {
         if (parentNodeId != null && !parentNode) throw new Error('Aborted Append Child Process: Parent Node doesn\'t exist in the current tree')
         
         const mapId = this.#generateId(id);
-        const newNode = this.#createNewNode(null, null, data, id, parentNode);
+        const newNode = this.#createNewNode(data, id, parentNode);
         if (!this.#root && parentNode == null) {
             this.#root = newNode;
             return mapId;
@@ -179,8 +179,8 @@ export class IdTree {
 }
 
 class IdTreeNode extends Node {
-    constructor(prev, next, data, id, parent) {
-        super(prev, next, data);
+    constructor(data, id, parent) {
+        super(data);
         this.id = id;
         this.parent = parent;
         this.children = new LinkedList();
