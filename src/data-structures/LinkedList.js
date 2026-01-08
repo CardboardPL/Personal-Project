@@ -1,5 +1,5 @@
 export class LinkedList {
-    #length
+    #length = 0;
 
     constructor(head = null) {
         if (head === null) {
@@ -9,24 +9,28 @@ export class LinkedList {
             if (!(head instanceof Node)) {
                 throw new Error('Provide a valid "head" node to create a linked list.');
             }
-            this.head = head;
-    
-            let curr = head;
-            while (curr.next !== null) {
-                curr = curr.next;
-            }
-    
-            this.tail = curr;
+            this.#length = this.#countItems(head, null, true);
         }
-
-        this.#length = this.#countItems();
     }
 
-    #countItems() {
+    #countItems(start, end, countAndAssign) {
         let counter = 0;
-        let node = this.head
+        let node = start;
 
-        while (node) {
+        if (countAndAssign) {
+            this.head = start;
+        }
+
+        const set = new Set();
+        while (node !== end) {
+            if (node === null) throw new Error('Unreachable end node.');
+            else if (set.has(node)) throw new Error('Circular References Detected.');
+            set.add(node);
+
+            if (countAndAssign && end === null) {
+                this.tail = node;
+            }
+
             node = node.next;
             counter++;
         }
@@ -66,7 +70,9 @@ export class LinkedList {
         return node;
     }
 
-    splice(nodePrev, nodeNext, node) {
+    splice(nodePrev, nodeNext, node, affectedNodeCount) {
+        const diff = typeof affectedNodeCount === 'number' ? affectedNodeCount : this.#countItems(nodePrev ? nodePrev.next : null, nodeNext);
+
         if (!nodePrev) {
             this.head = node;
             node.prev = null;
@@ -96,7 +102,7 @@ export class LinkedList {
             nodeNext.prev = node;
         }
 
-        this.#length++;
+        this.#length = this.#length + 1 - diff;
         return node;
     }
 
@@ -117,7 +123,7 @@ export class LinkedList {
         return node;
     }
 
-    removeNode(node, assumeIntegrity = true) {
+    removeNode(node) {
         if (!node) return null;
 
         if (!node.prev && node.next) {
@@ -137,7 +143,7 @@ export class LinkedList {
         node.prev = null;
         node.next = null;
 
-        this.#length = assumeIntegrity ? this.#length - 1 : this.#countItems();
+        this.#length--;
         return node;
     }
 
@@ -190,9 +196,9 @@ export class LinkedList {
 }
 
 export class Node {
-    constructor(prev, next, data) {    
-        this.prev = prev;
-        this.next = next;
+    constructor(data) {    
+        this.prev = null;
+        this.next = null;
         this.data = data;
     }
 }
