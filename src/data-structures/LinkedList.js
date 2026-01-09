@@ -106,6 +106,55 @@ export class LinkedList {
         return node;
     }
 
+    insertBefore(nodeNext, node, nodeInList) {
+        if (nodeInList) {
+            if (node.prev && node.next) {
+                node.prev.next = node.next;
+                node.next.prev = node.prev;
+            } else if (node.prev && !node.next && this.tail === node) {
+                node.prev.next = null;
+                this.tail = node.prev;
+            } else if (!node.prev && node.next && this.head === node) {
+                node.next.prev = null;
+                this.head = node.next;
+            } else if (nodeNext === node && !node.prev && !node.next) {
+                return node;         
+            } else if (nodeNext != null) {
+                throw new Error('Next node isn\'t on the list.');   
+            }
+        } else {
+            this.#length++;
+        }
+
+        if (nodeNext) {
+            node.next = nodeNext;
+            node.prev = nodeNext.prev;
+            nodeNext.prev = node;
+
+            if (node.prev) {
+                node.prev.next = node;
+            } else {
+                this.head = node;
+            }
+        } else if (!this.tail) {
+            this.head = node;
+            this.tail = node;
+            node.prev = null;
+            node.next = null;
+        } else {
+            this.tail.next = node;
+            node.prev = this.tail;
+            node.next = null;
+            this.tail = node;
+        }
+
+        return node;
+    }
+
+    insertAfter(nodePrev, node, nodeInList) {
+        return this.insertBefore(nodePrev.next, node, nodeInList);
+    }
+
     removeTailNode() {
         let node = null;
 
