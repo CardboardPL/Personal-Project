@@ -69,8 +69,8 @@ export class SinglyLinkedList {
 }
 
 export class SNode {
-    constructor(next, data) {
-        this.next = next;
+    constructor(data) {
+        this.next = null;
         this.data = data;
     }
 }
