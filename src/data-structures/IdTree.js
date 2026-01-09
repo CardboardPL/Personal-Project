@@ -81,7 +81,7 @@ export class IdTree {
         if (descendantNodeId != null && !descendantNode) throw new Error('Aborted Insert Node Process: Descendant Node doesn\'t exist in the current tree');
 
         let mapId = this.#generateId(id);
-        const newNode = this.#createNewNode(data, id, null);
+        const newNode = this.#createNewNode(data, mapId, null);
         if (!this.#root && descendantNode == null) {
             this.#root = newNode;
         } else {
@@ -114,7 +114,7 @@ export class IdTree {
         if (parentNodeId != null && !parentNode) throw new Error('Aborted Append Child Process: Parent Node doesn\'t exist in the current tree')
         
         const mapId = this.#generateId(id);
-        const newNode = this.#createNewNode(data, id, parentNode);
+        const newNode = this.#createNewNode(data, mapId, parentNode);
         if (!this.#root && parentNode == null) {
             this.#root = newNode;
             return mapId;
