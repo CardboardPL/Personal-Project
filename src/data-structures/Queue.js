@@ -8,7 +8,7 @@ export class Queue {
     }
 
     enqueue(data) {
-        const node = new SNode(null, data);
+        const node = new SNode(data);
         this.#linkedList.appendNode(node);
     }
 
