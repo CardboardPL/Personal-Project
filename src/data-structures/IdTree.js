@@ -56,6 +56,22 @@ export class IdTree {
         return this.#map.get(nodeId);
     }
 
+    /** Validates the arguments passed to move methods
+     * @private
+     * @param {IdTreeNode} node - The node being moved.
+     * @param {IdTreeNode} targetNode - The reference node.
+     * @returns {boolean} True if the move is valid and should proceed, false if the move is a harmless no-op.
+     * @throws Will throw an error if the move violates tree invariants (e.g., moving the root or moving relative to the root).
+     */
+    #validateMove(node, targetNode) {
+        if (!node) throw new Error('Aborted Move Node Process: Unknown node.');
+        if (!targetNode) throw new Error('Aborted Move Node Process: Unknown target node.');
+        if (node === this.#root) throw new Error('Aborted Move Node Process: Moving the root is not allowed.');
+        if (targetNode === this.#root) throw new Error('Aborted Move Node Process: Moving a node relative to the root is not allowed.');
+        if (node === targetNode) return false;
+        return true;
+    }
+
     #removeNodesFromMap(startNode) {
         const toProcess = new Queue();
         this.#map.delete(startNode.id);
@@ -67,6 +83,17 @@ export class IdTree {
                 toProcess.enqueue(child);
             }
         }
+    }
+
+    /** Detaches a desired node from its parent list
+     * @private
+     * @param {any} nodeId - The ID of the node being detached. 
+     * @returns {IdTreeNode} the detached node.
+     */
+    #detach(nodeId) {
+        const node = this.#retrieveNode(nodeId);
+        const ls = node.parent.children;
+        return ls.removeNode(node);
     }
 
     // The id parameter for insertParentAbove and appendChild allows the user to pass in custom ids when id generation is disabled.
@@ -154,6 +181,42 @@ export class IdTree {
         if (!node) throw new Error('Aborted Node Update Process: Node doesn\'t exist in the tree.');
 
         node.data = data;
+    }
+
+    /** Moves a node before a target node.
+     * @public
+     * @param {any} nodeId - The ID of the node being moved.
+     * @param {any} targetNodeId - The ID of the target node.
+     * @returns {any} the id of the node that was moved.
+     */
+    moveNodeBefore(nodeId, targetNodeId) {
+        const node = this.#detach(nodeId);
+        const targetNode = this.#retrieveNode(targetNodeId);
+        
+        // Safety checks
+        if (!this.#validateMove(node, targetNode)) {
+            return node.id;
+        }
+
+        return targetNode.parent.children.insertBefore(targetNode, node, false).id;
+    }
+
+    /** Moves a node after a target node.
+     * @public
+     * @param {any} nodeId - The ID of the node being moved.
+     * @param {any} targetNodeId - The ID of the target node.
+     * @returns {any} the id of the node that was moved.
+     */
+    moveNodeAfter(nodeId, targetNodeId) {
+        const node = this.#detach(nodeId);
+        const targetNode = this.#retrieveNode(targetNodeId);
+
+        // Safety checks
+        if (!this.#validateMove(node, targetNode)) {
+            return node.id;
+        }
+
+        return targetNode.parent.children.insertAfter(targetNode, node, false).id;
     }
 
     deleteSubtree(nodeId) {
