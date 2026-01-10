@@ -38,6 +38,33 @@ export class LinkedList {
         return counter;
     }
 
+    /** Detaches a node from the list.
+     * @private
+     * @param {Node} node - The node being detached from the list.
+     * @returns the detached node.
+     */
+    #detach(node) {
+        if (!node.prev && node.next) { // head node
+            this.head = node.next;
+            this.head.prev = null;
+        } else if (!node.prev && !node.next) { // single node
+            this.tail = null;
+            this.head = null;
+        } else if (!node.next && node.prev) { // tail node
+            this.tail = this.tail.prev;
+            this.tail.next = null;
+        } else { // middle node
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
+        }
+
+        // Reset pointers
+        node.prev = null;
+        node.next = null;
+
+        return node;
+    }
+
     prependNode(node) {
         const head = this.head;
 
@@ -106,22 +133,17 @@ export class LinkedList {
         return node;
     }
 
+    /**
+     * Insert a node before a desired node.
+     * @public
+     * @param {Node} nodeNext - The node before which 'node' should be inserted. If null, 'node' is appended.
+     * @param {Node} node - The node being inserted.
+     * @param {Boolean} nodeInList - True if the node is already in this list and must be detached first.
+     * @returns the inserted node.
+     */
     insertBefore(nodeNext, node, nodeInList) {
         if (nodeInList) {
-            if (node.prev && node.next) {
-                node.prev.next = node.next;
-                node.next.prev = node.prev;
-            } else if (node.prev && !node.next && this.tail === node) {
-                node.prev.next = null;
-                this.tail = node.prev;
-            } else if (!node.prev && node.next && this.head === node) {
-                node.next.prev = null;
-                this.head = node.next;
-            } else if (nodeNext === node && !node.prev && !node.next) {
-                return node;         
-            } else if (nodeNext != null) {
-                throw new Error('Next node isn\'t on the list.');   
-            }
+            this.#detach(node);
         } else {
             this.#length++;
         }
@@ -151,6 +173,14 @@ export class LinkedList {
         return node;
     }
 
+    /**
+     * Insert a node after a desired node.
+     * @public
+     * @param {Node} nodeNext - The node after which 'node' should be inserted. If null, 'node' is appended.
+     * @param {Node} node - The node being inserted.
+     * @param {Boolean} nodeInList - True if the node is already in this list and must be detached first.
+     * @returns the inserted node.
+     */
     insertAfter(nodePrev, node, nodeInList) {
         return this.insertBefore(nodePrev.next, node, nodeInList);
     }
@@ -172,26 +202,14 @@ export class LinkedList {
         return node;
     }
 
+    /** Removes a desired node from the list.
+     * @public
+     * @param {Node} node - The node being removed from the list.
+     * @returns the removed node.
+     */
     removeNode(node) {
         if (!node) return null;
-
-        if (!node.prev && node.next) {
-            this.head = node.next;
-            this.head.prev = null;
-        } else if (!node.prev && !node.next) {
-            this.tail = null;
-            this.head = null;
-        } else if (!node.next && node.prev) {
-            this.tail = this.tail.prev;
-            this.tail.next = null;
-        } else {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-        }
-        
-        node.prev = null;
-        node.next = null;
-
+        this.#detach(node);
         this.#length--;
         return node;
     }
