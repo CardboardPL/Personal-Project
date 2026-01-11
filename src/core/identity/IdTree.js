@@ -1,59 +1,42 @@
 import { LinkedList, Node } from './../collection/LinkedList.js';
 import { Queue } from './../collection/Queue.js';
+import { IdRegistry } from './IdRegistry.js';
 
 export class IdTree {
     #root;
-    #counter;
-    #map;
-    #idGenerator;
-    #enableIdGeneration;
+    #registry;
 
     constructor(rootConfig, enableIdGeneration = true, idGenerator) {
-        this.#counter = 0;
-        this.#map = new Map();
-        this.#enableIdGeneration = enableIdGeneration;
-
-        if (this.#enableIdGeneration) {
-            if (idGenerator != null && typeof idGenerator !== 'function') throw new Error('Invalid idGenerator: it must either be undefined/null to use the default ID generator or a function for custom ID generators');
-            this.#idGenerator = idGenerator || (() => this.#counter++);
-        }
+        this.#registry = new IdRegistry(enableIdGeneration, idGenerator);
 
         if (rootConfig) {
             const { id : rootId, data : rootData = null } = rootConfig;
-            this.#root = this.#createNewNode(rootData, this.#generateId(rootId), null);
+            this.#root = this.#registerNode(rootData, rootId, null);
         } else {
             this.#root = null;
         }
     }
 
-    #generateId(id) {
-        let mapId;
-
-        if (this.#enableIdGeneration) {
-            mapId = this.#idGenerator();
-        } else if (typeof id === 'string') {
-            mapId = id.trim();
-            if (!mapId) throw new Error('Passed an empty ID.');
-        } else if (typeof id === 'number') {
-            if (!Number.isFinite(id) || Number.isNaN(id)) throw new Error('Numerical IDs cannot be infinity or NaN.');
-            mapId = id;
-        } else {
-            throw new Error('Passed an invalid ID.');
-        }
-
-        if (this.#map.has(mapId)) throw new Error('Passed an existing id');
-
-        return mapId;
-    }
-
-    #createNewNode(data, id, parent) {
+    /** Registers a node to the tree.
+     * @private
+     * @param {any} data - The data that the node will hold.
+     * @param {any} id - The ID of the node.
+     * @param {IdTreeNode} parent - The parent of the node.
+     * @returns {{newNode, mapId}} an object containing the node created and its associated ID.
+     */
+    #registerNode(data, id, parent) {
         const newNode = new IdTreeNode(data, id, parent);
-        this.#map.set(id, newNode);
-        return newNode;
+        const mapId = this.#registry.setItem(id, newNode);
+        return { newNode, mapId };
     }
 
+    /** Retrieves a node from the registry via an ID.
+     * @private
+     * @param {any} nodeId - The ID of the node being retrieved.
+     * @returns {IdTreeNode|null} an IdTreeNode with the given nodeId or null if it doesn't exist.
+     */
     #retrieveNode(nodeId) {
-        return this.#map.get(nodeId);
+        return this.#registry.getItem(nodeId);
     }
 
     /** Determines whether a node can be moved relative to a target node.
@@ -72,14 +55,18 @@ export class IdTree {
         return true;
     }
 
+    /** Removes the IDs of a given subtree from the registry.
+     * @private
+     * @param {IdTreeNode} startNode - The root of the subtree being removed.
+     */
     #removeNodesFromMap(startNode) {
         const toProcess = new Queue();
-        this.#map.delete(startNode.id);
+        this.#registry.removeItem(startNode.id);
         toProcess.enqueue(startNode);
 
         for (const node of toProcess.consume()) {
             for (const child of node.children) {
-                this.#map.delete(child.id);
+                this.#registry.removeItem(child.id);
                 toProcess.enqueue(child);
             }
         }
@@ -95,7 +82,13 @@ export class IdTree {
         return ls.removeNode(node);
     }
 
-    // The id parameter for insertParentAbove and appendChild allows the user to pass in custom ids when id generation is disabled.
+    /** Inserts a new node above a given node.
+     * @public
+     * @param {any} descendantNodeId - The ID of the node that will become the child of the new node.
+     * @param {any} data - The data to store in the new parent node.
+     * @param {any} [id] - A custom ID that will be used if ID generation is disabled. Required if ID generation is disabled.
+     * @returns {any} the ID of the inserted node.
+     */
     insertParentAbove(descendantNodeId, data, id) {
         if (this.#root && !descendantNodeId) {
             throw new Error('Aborted Insert Node Process: Cannot insert before a null node when the tree already has a root.');
@@ -106,8 +99,7 @@ export class IdTree {
         const descendantNode =  this.#retrieveNode(descendantNodeId);
         if (descendantNodeId != null && !descendantNode) throw new Error('Aborted Insert Node Process: Descendant Node doesn\'t exist in the current tree');
 
-        let mapId = this.#generateId(id);
-        const newNode = this.#createNewNode(data, mapId, null);
+        const { newNode, mapId } = this.#registerNode(data, id, null);
         if (!this.#root && descendantNode == null) {
             this.#root = newNode;
         } else {
@@ -127,10 +119,17 @@ export class IdTree {
             // Make the parent node of the original node the new node
             descendantNode.parent = newNode;
         }
-    
+        this.insertParentAbove()
         return mapId;
     }
 
+    /** Appends a child node to a parent node.
+     * @public
+     * @param {any} parentNodeId - The ID of the parent node.
+     * @param {any} data - The data to store in the appended node.
+     * @param {any} [id] - A custom ID that will be used if ID generation is disabled. Required if ID generation is disabled.
+     * @returns {any} the ID of the appended node.
+     */
     appendChild(parentNodeId, data, id) {
         if (this.#root && parentNodeId == null) {
             throw new Error('Aborted Append Child Process: You can only create one root node');
@@ -139,8 +138,7 @@ export class IdTree {
         const parentNode = this.#retrieveNode(parentNodeId);
         if (parentNodeId != null && !parentNode) throw new Error('Aborted Append Child Process: Parent Node doesn\'t exist in the current tree')
         
-        const mapId = this.#generateId(id);
-        const newNode = this.#createNewNode(data, mapId, parentNode);
+        const { newNode, mapId } = this.#registerNode(data, id, parentNode);
         if (!this.#root && parentNode == null) {
             this.#root = newNode;
             return mapId;
@@ -150,12 +148,22 @@ export class IdTree {
         return mapId;
     }
 
+    /** Retrieves the data of a given node.
+     * @public
+     * @param {any} nodeId - The ID of the target node.
+     * @returns {any} the data of a given node.
+     */
     retrieveNodeData(nodeId) {
         const node = this.#retrieveNode(nodeId);
         if (!node) throw new Error('Aborted Parent Node ID Retrieval Process: Node doesn\'t exist in the tree');
         return node.data;
     }
 
+    /** Retrieves the ID of the parent of a given node.
+     * @public
+     * @param {any} nodeId - The ID of the target node.
+     * @returns the ID of the parent node or null if the target node doesn't have a parent node.
+     */
     retrieveParentNodeId(nodeId) {
         const node = this.#retrieveNode(nodeId);
         if (!node) throw new Error('Aborted Parent Node ID Retrieval Process: Node doesn\'t exist in the tree');
@@ -163,6 +171,11 @@ export class IdTree {
         return parentNode ? parentNode.id : null;
     }
 
+    /** Retrieves the IDs of the children nodes of a given node.
+     * @public
+     * @param {any} nodeId  - The ID of the target node.
+     * @returns {(any)[]} an array of IDs representing the children nodes of the target node.
+     */
     retrieveChildrenNodeIds(nodeId) {
         const parentNode = this.#retrieveNode(nodeId);
         if (!parentNode) throw new Error('Aborted Parent Node ID Retrieval Process: Node doesn\'t exist in the tree');
@@ -175,7 +188,12 @@ export class IdTree {
         return idArray;
     }
 
-    updateNodeData(nodeId, data) {
+    /** Overwrites the data of a given node.
+     * @public
+     * @param {any} nodeId - The ID of the target node.
+     * @param {any} data - The new data.
+     */
+    overwriteNodeData(nodeId, data) {
         const node = this.#retrieveNode(nodeId);
         if (!node) throw new Error('Aborted Node Update Process: Node doesn\'t exist in the tree.');
 
@@ -218,6 +236,10 @@ export class IdTree {
         return targetNode.parent.children.insertAfter(targetNode, this.#detach(node), false).id;
     }
 
+    /** Deletes a subtree given its root.
+     * @public
+     * @param {any} nodeId - The ID of the root of the subtree. 
+     */
     deleteSubtree(nodeId) {
         const node = this.#retrieveNode(nodeId);
         if (!node) throw new Error('Aborted Subtree Deletion Process: Node doesn\'t exist in the tree.');
