@@ -56,14 +56,14 @@ export class IdTree {
         return this.#map.get(nodeId);
     }
 
-    /** Validates the arguments passed to move methods
+    /** Determines whether a node can be moved relative to a target node.
      * @private
      * @param {IdTreeNode} node - The node being moved.
      * @param {IdTreeNode} targetNode - The reference node.
-     * @returns {boolean} True if the move is valid and should proceed, false if the move is a harmless no-op.
+     * @returns {boolean} True if the move is allowed; false otherwise.
      * @throws Will throw an error if the move violates tree invariants (e.g., moving the root or moving relative to the root).
      */
-    #validateMove(node, targetNode) {
+    #canMove(node, targetNode) {
         if (!node) throw new Error('Aborted Move Node Process: Unknown node.');
         if (!targetNode) throw new Error('Aborted Move Node Process: Unknown target node.');
         if (node === this.#root) throw new Error('Aborted Move Node Process: Moving the root is not allowed.');
@@ -87,11 +87,10 @@ export class IdTree {
 
     /** Detaches a desired node from its parent list
      * @private
-     * @param {any} nodeId - The ID of the node being detached. 
+     * @param {IdTreeNode} node - The node being detached. 
      * @returns {IdTreeNode} the detached node.
      */
-    #detach(nodeId) {
-        const node = this.#retrieveNode(nodeId);
+    #detach(node) {
         const ls = node.parent.children;
         return ls.removeNode(node);
     }
@@ -190,15 +189,15 @@ export class IdTree {
      * @returns {any} the id of the node that was moved.
      */
     moveNodeBefore(nodeId, targetNodeId) {
-        const node = this.#detach(nodeId);
+        const node = this.#retrieveNode(nodeId);
         const targetNode = this.#retrieveNode(targetNodeId);
         
         // Safety checks
-        if (!this.#validateMove(node, targetNode)) {
+        if (!this.#canMove(node, targetNode)) {
             return node.id;
         }
 
-        return targetNode.parent.children.insertBefore(targetNode, node, false).id;
+        return targetNode.parent.children.insertBefore(targetNode, this.#detach(node), false).id;
     }
 
     /** Moves a node after a target node.
@@ -208,15 +207,15 @@ export class IdTree {
      * @returns {any} the id of the node that was moved.
      */
     moveNodeAfter(nodeId, targetNodeId) {
-        const node = this.#detach(nodeId);
+        const node = this.#retrieveNode(nodeId);
         const targetNode = this.#retrieveNode(targetNodeId);
 
         // Safety checks
-        if (!this.#validateMove(node, targetNode)) {
+        if (!this.#canMove(node, targetNode)) {
             return node.id;
         }
 
-        return targetNode.parent.children.insertAfter(targetNode, node, false).id;
+        return targetNode.parent.children.insertAfter(targetNode, this.#detach(node), false).id;
     }
 
     deleteSubtree(nodeId) {
