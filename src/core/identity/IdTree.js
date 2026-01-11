@@ -11,7 +11,7 @@ export class IdTree {
 
         if (rootConfig) {
             const { id : rootId, data : rootData = null } = rootConfig;
-            this.#root = this.#registerNode(rootData, rootId, null);
+            this.#root = this.#registerNode(rootData, rootId, null).newNode;
         } else {
             this.#root = null;
         }
@@ -119,7 +119,7 @@ export class IdTree {
             // Make the parent node of the original node the new node
             descendantNode.parent = newNode;
         }
-        this.insertParentAbove()
+
         return mapId;
     }
 
