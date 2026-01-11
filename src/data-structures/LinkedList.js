@@ -142,12 +142,15 @@ export class LinkedList {
      * @returns the inserted node.
      */
     insertBefore(nodeNext, node, nodeInList) {
+        if (nodeNext === node) return node;
+
         if (nodeInList) {
             this.#detach(node);
         } else {
             this.#length++;
         }
 
+        // Insert before existing node
         if (nodeNext) {
             node.next = nodeNext;
             node.prev = nodeNext.prev;
@@ -158,11 +161,13 @@ export class LinkedList {
             } else {
                 this.head = node;
             }
+        // Insert into empty list
         } else if (!this.tail) {
             this.head = node;
             this.tail = node;
             node.prev = null;
             node.next = null;
+        // Append at end
         } else {
             this.tail.next = node;
             node.prev = this.tail;
