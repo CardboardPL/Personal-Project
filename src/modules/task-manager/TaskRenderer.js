@@ -1,4 +1,4 @@
-import { escapeHTML } from '../../utils/sanitize.js';
+import { escapeHTML } from './../../core/utils/sanitize.js';
 import { TaskList } from './TaskList.js';
 
 export class TaskRenderer {

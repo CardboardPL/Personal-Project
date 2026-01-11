@@ -1,5 +1,5 @@
-import { LinkedList, Node } from './LinkedList.js';
-import { Queue } from './Queue.js';
+import { LinkedList, Node } from './../collection/LinkedList.js';
+import { Queue } from './../collection/Queue.js';
 
 export class IdTree {
     #root;

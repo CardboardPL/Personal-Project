@@ -1,4 +1,4 @@
-import { Queue } from './../../data-structures/Queue.js';
+import { Queue } from './../../collection/Queue.js';
 import { SchemaField } from './SchemaField.js';
 
 export class ValidationSchema {

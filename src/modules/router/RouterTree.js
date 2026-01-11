@@ -1,4 +1,4 @@
-import { Node } from '../../data-structures/LinkedList.js';
+import { Node } from './../../core/collection/LinkedList.js';
 import { Tree, TreeNode } from '../../data-structures/Tree.js';
 
 export class RouterTree extends Tree {

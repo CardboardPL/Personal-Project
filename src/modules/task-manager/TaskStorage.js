@@ -1,5 +1,5 @@
-import { Queue } from './../../data-structures/Queue.js';
-import { IdTree } from './../../data-structures/IdTree.js';
+import { Queue } from './../../core/collection/Queue.js';
+import { IdTree } from './../../core/identity/IdTree.js';
 
 export class TaskStorage {
     #storageId;

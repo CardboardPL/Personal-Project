@@ -1,4 +1,4 @@
-import { LinkedList, Node } from "./LinkedList.js";
+import { LinkedList, Node } from "./../collection/LinkedList.js";
 
 export class GenericTree {
     #useLinkedList;
