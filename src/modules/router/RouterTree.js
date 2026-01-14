@@ -5,6 +5,23 @@ export class RouterTree {
 
     constructor() {
         this.#tree = new GenericTree(true);
+        this.#tree.appendChild(null, this.#packageData('root', {
+            html: null,
+            css: null,
+            js: null
+        }));
+    }
+
+    #normalizePath(path) {
+        let str = '';
+        
+        for (let i = 0; i < path.length; i++) {
+            const char = path[i];
+            if ((i === 0 || i === path.length - 1) && char === '/') continue;
+            str += char;
+        }
+
+        return str;
     }
 
     #packageData(segmentName, data) {
@@ -18,8 +35,9 @@ export class RouterTree {
     }
 
     #getSegmentNode(path) {
-        const segments = path.split('/');
-        if (!this.#tree.root) throw new Error('Invalid path.'); // Throw 404 or smth
+        if (path == null) return this.#tree.root;
+        const segments = this.#normalizePath(path).split('/');
+        
 
         let curr = this.#tree.root;
         for (const segment of segments) {
@@ -35,8 +53,8 @@ export class RouterTree {
 
         this.#tree.appendChild(parentNode, this.#packageData(segmentName, data));
 
-        const separator = parentPath[parentPath.length - 1] === '/' ? '' : '/';
-        return parentPath + separator + segmentName.replace('/', '');
+        const separator = parentPath && parentPath[parentPath.length - 1] === '/' ? '' : '/';
+        return (parentPath == null ? '' : parentPath) + separator + segmentName.replace('/', '');
     }
 
     removeSegment(parentPath, segmentName) {
