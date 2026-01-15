@@ -57,8 +57,11 @@ export class RouterTree {
         return (parentPath == null ? '' : parentPath) + separator + segmentName.replace('/', '');
     }
 
-    removeSegment(parentPath, segmentName) {
-
+    removeSegment(path) {
+        const node = this.#getSegmentNode(path);
+        if (!node) throw new Error('Invalid path.');
+        if (!node.parent) throw new Error('Cannot remove the root.');
+        node.parent.data.map.delete(node.data.segmentName);
     }
 
     getSegmentData(path) {
