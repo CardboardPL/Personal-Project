@@ -2,14 +2,24 @@ import { GenericTree } from './../../core/tree/GenericTree.js';
 
 export class RouterTree {
     #tree;
+    #errorConfig;
 
-    constructor() {
+    constructor(errorConfig) {
         this.#tree = new GenericTree(true);
         this.#tree.appendChild(null, this.#packageData('root', {
             html: null,
             css: null,
             js: null
         }));
+
+        if (typeof errorConfig === 'object') {
+            this.#errorConfig = errorConfig;
+        } 
+    }
+
+    #getErrorConfig(key) {
+        if (!this.#errorConfig) return null;
+        return this.#errorConfig[key] || null;
     }
 
     #normalizePath(path) {
@@ -41,7 +51,13 @@ export class RouterTree {
 
         let curr = this.#tree.root;
         for (const segment of segments) {
-            if (!curr) throw new Error('Invalid path.'); // Throw 404 or smth
+            if (!curr) {
+                const error = new Error('Invalid path.');
+                error.status = 404;
+                error.errorCode = 'SEGMENT_NOT_FOUND';
+                error.details = this.#getErrorConfig('NOT_FOUND');
+                throw error;
+            };
             curr = curr.map.get(segment);
         }
 
