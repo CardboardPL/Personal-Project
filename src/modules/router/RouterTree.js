@@ -1,4 +1,5 @@
 import { GenericTree } from './../../core/tree/GenericTree.js';
+import { NavigationError } from '../../core/errors/NavigationError.js';
 
 export class RouterTree {
     #tree;
@@ -52,11 +53,7 @@ export class RouterTree {
         let curr = this.#tree.root;
         for (const segment of segments) {
             if (!curr) {
-                const error = new Error('Invalid path.');
-                error.status = 404;
-                error.errorCode = 'SEGMENT_NOT_FOUND';
-                error.details = this.#getErrorConfig('NOT_FOUND');
-                throw error;
+                throw new NavigationError('SEGMENT_NOT_FOUND', 404, this.#getErrorConfig('NOT_FOUND'));
             };
             curr = curr.map.get(segment);
         }
