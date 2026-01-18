@@ -16,10 +16,13 @@ export class GenericTree {
         if (!(parentNode instanceof GenericTreeNode)) throw new Error('Invalid parentNode: Must be a GenericTreeNode');
 
         const node = new GenericTreeNode(parentNode, data, this.#useLinkedList);
-        if (!this.#useLinkedList) {
+        if (this.#useLinkedList) {
+            parentNode.children.appendNode(node)
+        } else {
             parentNode.children.push(node);
         }
-        return this.#useLinkedList ? parentNode.children.appendNode(new Node(node)) : node;
+        
+        return node;
     }
 
     removeChild(parentNode, node) {
