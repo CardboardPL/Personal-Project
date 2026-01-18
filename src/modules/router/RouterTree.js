@@ -55,7 +55,7 @@ export class RouterTree {
             if (!curr) {
                 throw new NavigationError('SEGMENT_NOT_FOUND', 404, this.#getErrorConfig('NOT_FOUND'));
             };
-            curr = curr.map.get(segment);
+            curr = curr.data.map.get(segment);
         }
 
         return curr;
@@ -64,7 +64,10 @@ export class RouterTree {
     appendSegment(parentPath, segmentName, data) {
         const parentNode = this.#getSegmentNode(parentPath);
 
-        this.#tree.appendChild(parentNode, this.#packageData(segmentName, data));
+        parentNode.data.map.set(
+            segmentName, 
+            this.#tree.appendChild(parentNode, this.#packageData(segmentName, data))
+        );
 
         const separator = parentPath && parentPath[parentPath.length - 1] === '/' ? '' : '/';
         return (parentPath == null ? '' : parentPath) + separator + segmentName.replace('/', '');
