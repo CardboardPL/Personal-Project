@@ -5,8 +5,8 @@ export class Router {
     #navTree;
     #renderer;
 
-    constructor() {
-        
+    constructor(errorConfig) {
+        this.#navTree = new RouterTree(errorConfig);
     }
 
     addPath() {
