@@ -62,7 +62,15 @@ export class RouterTree {
     }
 
     appendSegment(parentPath, segmentName, data) {
+        if (typeof parentPath !== 'string') throw new Error('parentPath must be a string.');
+        if (typeof segmentName !== 'string') throw new Error('segmentName must be a string.');
+        if (typeof data !== 'object' || data == null) throw new Error('data must be an object.');
+        
+        segmentName = segmentName.trim();
+        parentPath = parentPath.trim();
         const parentNode = this.#getSegmentNode(parentPath);
+
+        if (parentNode !== this.#tree.root && segmentName === '') throw new Error('Cannot create a segment whose name is empty unless the parentNode is the root.');
 
         parentNode.data.map.set(
             segmentName, 
