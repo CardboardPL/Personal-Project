@@ -1,5 +1,5 @@
-import { GenericTree } from './../../core/tree/GenericTree.js';
-import { NavigationError } from '../../core/errors/NavigationError.js';
+import { GenericTree } from './../tree/GenericTree.js';
+import { NavigationError } from './../errors/NavigationError.js';
 
 export class RouterTree {
     #tree;
