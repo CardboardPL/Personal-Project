@@ -1,13 +1,18 @@
+import { AppRenderer } from './../renderer/AppRenderer.js';
+
 export class RouterRenderer {
-    constructor() {
-        
+    #appRenderer;
+
+    constructor(appRenderer) {
+        if (!(appRenderer instanceof AppRenderer)) throw new Error('Invalid');
+        this.#appRenderer = appRenderer;
     }
 
-    renderPathMain(path) {
-        
+    renderMain(data) {
+        this.#appRenderer.renderContainer(data.html);
     }
 
-    renderPathElement(path, element) {
+    renderElement(data, element) {
         
     }
 }
