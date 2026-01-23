@@ -5,7 +5,11 @@ export class Router {
     #navTree;
     #renderer;
 
-    constructor(errorConfig) {
+    constructor(appRenderer, errorConfig) {
+        this.#renderer = {
+            router: new RouterRenderer(appRenderer),
+            app: appRenderer
+        };
         this.#navTree = new RouterTree(errorConfig);
     }
 
