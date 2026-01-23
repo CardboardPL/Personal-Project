@@ -1,4 +1,4 @@
-class AppRenderer {
+export class AppRenderer {
     #rootElem;
     
     constructor(rootElem) {
