@@ -28,4 +28,8 @@ export class AppRenderer {
     renderContainer(template) {
         this.#rootElem.innerHTML = template;
     }
+
+    appendTemplate(template) {
+        this.#rootElem.insertAdjacentHTML('beforeend', template);
+    }
 }
