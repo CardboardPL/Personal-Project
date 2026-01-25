@@ -12,7 +12,7 @@ export class RouterRenderer {
         this.#appRenderer.renderContainer(data.html);
     }
 
-    renderElement(data, element) {
-        
+    renderElement(data) {
+        this.#appRenderer.appendTemplate(data.html);
     }
 }
