@@ -32,4 +32,16 @@ export class AppRenderer {
     appendTemplate(template) {
         this.#rootElem.insertAdjacentHTML('beforeend', template);
     }
+
+    appendTemplateInMain(selector, template) {
+        this.#rootElem.querySelector(selector).insertAdjacentHTML('beforeend', template);
+    }
+
+    appendTemplateBefore(selector, template) {
+        this.#rootElem.querySelector(selector).insertAdjacentHTML('beforebegin', template);
+    }
+
+    appendTemplateAfter(selector, template) {
+        this.#rootElem.querySelector(selector).insertAdjacentHTML('afterend', template);
+    }
 }
