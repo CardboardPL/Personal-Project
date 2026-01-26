@@ -25,23 +25,35 @@ export class AppRenderer {
         if (forbiddenTags.includes(rootElem.tagName)) throw new Error('The provided rootElem is a forbidden tag.');
     }
 
+    #validateTemplate(template) {
+        if (typeof template !== 'string') throw new Error('Template must be of type string.');
+    }
+
+    #mountTemplate(elem, template, pos) {
+        if (!elem) throw new Error('The element passed must be a valid HTML element.');
+
+        this.#validateTemplate(template);
+        elem.insertAdjacentHTML(pos, template);
+    }
+
     renderContainer(template) {
+        this.#validateTemplate(template);
         this.#rootElem.innerHTML = template;
     }
 
     appendTemplate(template) {
-        this.#rootElem.insertAdjacentHTML('beforeend', template);
+        this.#mountTemplate(this.#rootElem, template, 'beforeend');
     }
 
     appendTemplateInMain(selector, template) {
-        this.#rootElem.querySelector(selector).insertAdjacentHTML('beforeend', template);
+        this.#mountTemplate(this.#rootElem.querySelector(selector), template, 'beforeend');
     }
 
     appendTemplateBefore(selector, template) {
-        this.#rootElem.querySelector(selector).insertAdjacentHTML('beforebegin', template);
+        this.#mountTemplate(this.#rootElem.querySelector(selector), template, 'beforebegin');
     }
 
     appendTemplateAfter(selector, template) {
-        this.#rootElem.querySelector(selector).insertAdjacentHTML('afterend', template);
+        this.#mountTemplate(this.#rootElem.querySelector(selector), template, 'afterend');
     }
 }
