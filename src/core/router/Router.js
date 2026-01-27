@@ -13,8 +13,8 @@ export class Router {
         this.#navTree = new RouterTree(errorConfig);
     }
 
-    addPath() {
-        
+    addSegment(parentPath, segmentName, data) {
+        this.#navTree.appendSegment(parentPath, segmentName, data);
     }
 
     findSegmentNode() {
