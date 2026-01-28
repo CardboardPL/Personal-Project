@@ -14,23 +14,15 @@ export class Router {
     }
 
     addSegment(parentPath, segmentName, data) {
-        this.#navTree.appendSegment(parentPath, segmentName, data);
+        return this.#navTree.appendSegment(parentPath, segmentName, data);
     }
 
-    findSegmentNode() {
+    getSegmentData() {
         
     }
 
-    removePath() {
-       
-    }
-
-    getNodeContent() {
-        
-    }
-
-    getSegmentHTML() {
-        
+    removeSegment(path) {
+       this.#navTree.removeSegment(path);
     }
 
     navigateTo() {
