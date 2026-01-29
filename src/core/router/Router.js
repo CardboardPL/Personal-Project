@@ -17,8 +17,8 @@ export class Router {
         return this.#navTree.appendSegment(parentPath, segmentName, data);
     }
 
-    getSegmentData() {
-        
+    getSegmentData(path) {
+        return this.#navTree.getSegmentData(path);
     }
 
     removeSegment(path) {
