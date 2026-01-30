@@ -45,10 +45,16 @@ export class RouterTree {
         }
     }
 
-    #getSegmentNode(path) {
-        if (path == null) return this.#tree.root;
-        const segments = this.#normalizePath(path).split('/');
-        
+    #getSegmentNode(segments) {
+        if (segments == null) return this.#tree.root;
+
+        if (typeof segments !== 'string' && !Array.isArray(segments)) {
+            throw new Error('Invalid argument: argument must either be an array of segments or a path.');
+        }
+
+        if (typeof segments === 'string') {
+            segments = this.#normalizePath(segments).split('/');
+        }
 
         let curr = this.#tree.root;
         for (const segment of segments) {
@@ -89,9 +95,13 @@ export class RouterTree {
     }
 
     getSegmentData(path) {
+        // Make this quiet
         const segmentNode = this.#getSegmentNode(path);
-        if (!segmentNode) throw new Error('Invalid Path.');
-        const { html, css, js } = segmentNode.data;
-        return { html, css, js };
+        if (!segmentNode || segmentNode === this.#tree.root) throw new Error('Invalid Path.');
+        return {
+            html: segmentNode.data.html,
+            css: segmentNode.data.css,
+            js: segmentNode.data.js
+        };
     }
 }
