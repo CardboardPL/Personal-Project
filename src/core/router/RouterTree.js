@@ -35,12 +35,13 @@ export class RouterTree {
         return str;
     }
 
-    #packageData(segmentName, data) {
+    #packageData(segmentName, data, isWildCardContainer) {
         return {
             segmentName,
             html: data.html,
             css: data.css,
             js: data.js,
+            isWildCardContainer,
             map: new Map()
         }
     }
@@ -67,7 +68,7 @@ export class RouterTree {
         return curr;
     }
 
-    appendSegment(parentPath, segmentName, data) {
+    appendSegment(parentPath, segmentName, data, isWildCardContainer) {
         if (typeof parentPath !== 'string') throw new Error('parentPath must be a string.');
         if (typeof segmentName !== 'string') throw new Error('segmentName must be a string.');
         if (typeof data !== 'object' || data == null) throw new Error('data must be an object.');
@@ -80,7 +81,7 @@ export class RouterTree {
 
         parentNode.data.map.set(
             segmentName, 
-            this.#tree.appendChild(parentNode, this.#packageData(segmentName, data))
+            this.#tree.appendChild(parentNode, this.#packageData(segmentName, data, isWildCardContainer))
         );
 
         const separator = parentPath && parentPath[parentPath.length - 1] === '/' ? '' : '/';
