@@ -35,53 +35,81 @@ export class RouterTree {
         return str;
     }
 
-    #packageData(segmentName, data, isWildCardContainer) {
+    #packageData(segmentName, data, wildCardInfo) {
         return {
             segmentName,
             html: data.html,
             css: data.css,
             js: data.js,
-            isWildCardContainer,
+            wildCardInfo: {
+                isContainer: wildCardInfo.isContainer,
+                valueName: wildCardInfo.valueName,
+                valueType: wildCardInfo.valueType
+            },
             map: new Map()
         }
     }
 
-    #getSegmentNode(segments) {
+    #getPathData(segments) {
         if (segments == null) return this.#tree.root;
 
         if (typeof segments !== 'string' && !Array.isArray(segments)) {
-            throw new Error('Invalid argument: argument must either be an array of segments or a path.');
+            return null;
         }
 
         if (typeof segments === 'string') {
             segments = this.#normalizePath(segments).split('/');
         }
-
+        
         let curr = this.#tree.root;
-        for (const segment of segments) {
+        const resultObj = { node: curr, context: {} };
+        for (let i = 0; i < segments.length; i++) {
+            const segment = segments[i];
+            const wildCardInfo = curr.data.wildCardInfo;
+            if (wildCardInfo.isContainer) {
+                if (wildCardInfo.valueType === 'path') {
+                    const pathSegments = segments.splice(i);
+                    const params = pathSegments[pathSegments.length - 1].split('?');
+                    pathSegments[pathSegments.length - 1] = params[0];
+                    resultObj.context[wildCardInfo.valueName] = {
+                        value: pathSegments.join('/'),
+                        paramStr: params[1] || ''
+                    };
+                    return resultObj;
+                } else {
+                    const params = segment.split('?');
+                    resultObj.context[wildCardInfo.valueName] = {
+                        value: params[0],
+                        paramStr: params[1]
+                    };
+                }
+                continue;
+            }
             if (!curr) {
                 throw new NavigationError('SEGMENT_NOT_FOUND', 404, this.#getErrorConfig('NOT_FOUND'));
             };
             curr = curr.data.map.get(segment);
+            resultObj.node = curr;
         }
 
-        return curr;
+        return resultObj;
     }
 
-    appendSegment(parentPath, segmentName, data, isWildCardContainer) {
+    appendSegment(parentPath, segmentName, data, wildCardInfo) {
         if (typeof parentPath !== 'string') throw new Error('parentPath must be a string.');
         if (typeof segmentName !== 'string') throw new Error('segmentName must be a string.');
-        if (typeof data !== 'object' || data == null) throw new Error('data must be an object.');
+        if (typeof data !== 'object' || Array.isArray(data) || data == null ) throw new Error('data must be a plain object.');
+        if (typeof wildCardInfo !== 'object' || Array.isArray(wildCardInfo) || wildCardInfo == null) throw new Error('wildCardInfo must be a plain object.');
         
         segmentName = segmentName.trim();
         parentPath = parentPath.trim();
-        const parentNode = this.#getSegmentNode(parentPath);
+        const parentNode = this.#getPathData(parentPath).node;
 
         if (parentNode !== this.#tree.root && segmentName === '') throw new Error('Cannot create a segment whose name is empty unless the parentNode is the root.');
 
         parentNode.data.map.set(
             segmentName, 
-            this.#tree.appendChild(parentNode, this.#packageData(segmentName, data, isWildCardContainer))
+            this.#tree.appendChild(parentNode, this.#packageData(segmentName, data, wildCardInfo))
         );
 
         const separator = parentPath && parentPath[parentPath.length - 1] === '/' ? '' : '/';
@@ -89,20 +117,21 @@ export class RouterTree {
     }
 
     removeSegment(path) {
-        const node = this.#getSegmentNode(path);
+        const node = this.#getPathData(path).node;
         if (!node) throw new Error('Invalid path.');
         if (!node.parent) throw new Error('Cannot remove the root.');
         node.parent.data.map.delete(node.data.segmentName);
     }
 
     getSegmentData(path) {
-        // Make this quiet
-        const segmentNode = this.#getSegmentNode(path);
+        const pathData = this.#getPathData(path);
+        const segmentNode = pathData.node;
         if (!segmentNode || segmentNode === this.#tree.root) throw new Error('Invalid Path.');
         return {
             html: segmentNode.data.html,
             css: segmentNode.data.css,
-            js: segmentNode.data.js
+            js: segmentNode.data.js,
+            context: pathData.context
         };
     }
 }
