@@ -44,22 +44,17 @@ export class RouterTree {
             wildCardInfo: {
                 isContainer: wildCardInfo.isContainer,
                 valueName: wildCardInfo.valueName,
-                valueType: wildCardInfo.valueType
+                segmentCount: wildCardInfo.segmentCount
             },
             map: new Map()
         }
     }
 
-    #getPathData(segments) {
-        if (segments == null) return this.#tree.root;
+    #getPathData(path) {
+        if (path == null) return this.#tree.root;
+        if (typeof path !== 'string') throw new Error(`Invalid path: expected path to be of type "string" but received a "${typeof path}"`);
 
-        if (typeof segments !== 'string' && !Array.isArray(segments)) {
-            return null;
-        }
-
-        if (typeof segments === 'string') {
-            segments = this.#normalizePath(segments).split('/');
-        }
+        const segments = this.#normalizePath(path).split('/');
         
         let curr = this.#tree.root;
         const resultObj = { node: curr, context: {} };
@@ -67,28 +62,20 @@ export class RouterTree {
             const segment = segments[i];
             const wildCardInfo = curr.data.wildCardInfo;
             if (wildCardInfo.isContainer) {
-                if (wildCardInfo.valueType === 'path') {
-                    const pathSegments = segments.splice(i);
-                    const params = pathSegments[pathSegments.length - 1].split('?');
-                    pathSegments[pathSegments.length - 1] = params[0];
-                    resultObj.context[wildCardInfo.valueName] = {
-                        value: pathSegments.join('/'),
-                        paramStr: params[1] || ''
-                    };
+                if (wildCardInfo.segmentCount === 'all') {
+                    resultObj.context[wildCardInfo.valueName] = segments.slice(i);
                     return resultObj;
                 } else {
-                    const params = segment.split('?');
-                    resultObj.context[wildCardInfo.valueName] = {
-                        value: params[0],
-                        paramStr: params[1]
-                    };
+                    const endIndex = i + wildCardInfo.segmentCount;;
+                    resultObj.context[wildCardInfo.valueName] = segments.slice(i, endIndex);
+                    i = endIndex - 1;
                 }
                 continue;
             }
+            curr = curr.data.map.get(segment);
             if (!curr) {
                 throw new NavigationError('SEGMENT_NOT_FOUND', 404, this.#getErrorConfig('NOT_FOUND'));
             };
-            curr = curr.data.map.get(segment);
             resultObj.node = curr;
         }
 
