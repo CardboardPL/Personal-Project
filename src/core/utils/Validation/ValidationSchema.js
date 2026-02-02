@@ -56,7 +56,7 @@ export class ValidationSchema {
 
         while (schemaList.queueSize()) {
             const currSchemaData = schemaList.dequeue();
-            const [currSchemaDepth, currSchema] = [currSchema.depth, currSchemaData.schema];
+            const [currSchemaDepth, currSchema] = [currSchemaData.depth, currSchemaData.schema];
             this.#connectedSchemas.add(currSchema);
 
             for (const key in currSchema) {
