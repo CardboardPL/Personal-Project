@@ -98,9 +98,6 @@ export class RouterTree {
             segmentName, 
             this.#tree.appendChild(parentNode, this.#packageData(segmentName, data, wildCardInfo))
         );
-
-        const separator = parentPath && parentPath[parentPath.length - 1] === '/' ? '' : '/';
-        return (parentPath == null ? '' : parentPath) + separator + segmentName.replace('/', '');
     }
 
     removeSegment(path) {
