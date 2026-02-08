@@ -50,28 +50,37 @@ export class RouterTree {
         }
     }
 
+    /** Retrieves the data of a given path.
+     * @private
+     * @param {string} path - the path from the root to the desired component
+     * @returns an object containing the anchor node and context (params) of the provided path.
+     */
     #getPathData(path) {
         if (path == null) return this.#tree.root;
         if (typeof path !== 'string') throw new Error(`Invalid path: expected path to be of type "string" but received a "${typeof path}"`);
 
         const segments = this.#normalizePath(path).split('/');
         
+        // Traverses the segments to gather the context and the current node
         let curr = this.#tree.root;
         const resultObj = { node: curr, context: {} };
         for (let i = 0; i < segments.length; i++) {
             const segment = segments[i];
             const wildCardInfo = curr.data.wildCardInfo;
+            // Checks if an element is a wildcard container and decides whether to extract a part or the rest of the segments as "context"
             if (wildCardInfo.isContainer) {
                 if (wildCardInfo.segmentCount === 'all') {
                     resultObj.context[wildCardInfo.valueName] = segments.slice(i);
                     return resultObj;
                 } else {
-                    const endIndex = i + wildCardInfo.segmentCount;;
+                    const endIndex = i + wildCardInfo.segmentCount;
                     resultObj.context[wildCardInfo.valueName] = segments.slice(i, endIndex);
                     i = endIndex - 1;
                 }
                 continue;
             }
+
+            // Takes the next segment node
             curr = curr.data.map.get(segment);
             if (!curr) {
                 throw new NavigationError('SEGMENT_NOT_FOUND', 404, this.#getErrorConfig('NOT_FOUND'));
