@@ -33,15 +33,20 @@ export class EventRegistry {
         // Check if the passed arguments are valid
         if (!(element instanceof HTMLElement)) throw new Error('Failed to Remove Event Listener: element must be an instance of HTMLElement');
         if (typeof event !== 'string' || !this.#validEvents.includes(event)) throw new Error('Failed to Remove Event Listener: invalid event');
+        if (!this.#listeners.has(element)) throw new Error('Failed to Remove Event Listener: must be an existing element');
 
         const elementMap = this.#listeners.get(element);
-        if (!this.#listeners.has(element)) throw new Error('Failed to Remove Event Listener: must be an existing element');
         if (!elementMap.has(event)) throw new Error('Failed to Remove Event Listener: must be a registered event');
 
         // Remove Event Listener
         const handler = elementMap.get(event);
         elementMap.delete(event);
         element.removeEventListener(event, handler);
+
+        // Remove element entry if it's empty
+        if (elementMap.size === 0) {
+            this.#listeners.delete(element);
+        }
     }
 
     clearAll() {
