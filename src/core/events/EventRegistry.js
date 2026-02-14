@@ -45,6 +45,12 @@ export class EventRegistry {
     }
 
     clearAll() {
-        
+        for (const [element, eventMap] of this.#listeners) {
+            for (const [event, handler] of eventMap) {
+                element.removeEventListener(event, handler);
+            }
+        }
+
+        this.#listeners.clear();
     }
 }
