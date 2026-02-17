@@ -1,11 +1,24 @@
+import { Queue } from "../collection/Queue.js";
+
 export class EventRegistry {
     #listeners;
     #validEvents = [
         'click'
     ];
 
-    constructor() {
+    constructor(eventBus) {
         this.#listeners = new Map();
+        eventBus.subscribe('UI:Deleted', (parent) => {
+            const queue = new Queue().enqueue(parent);
+
+            for (const elem of queue.consume()) {
+                if (this.#listeners.has(elem)) this.#listeners.delete(elem);
+                
+                for (const child of elem.children) {
+                    queue.enqueue(child);
+                }
+            }
+        });
     }
 
     addEventListener(element, event, handler) {
