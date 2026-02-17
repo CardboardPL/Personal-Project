@@ -1,16 +1,23 @@
 import { RouterTree } from './RouterTree.js';
 import { RouterRenderer } from './RouterRenderer.js';
+import { AppRenderer } from '../renderer/AppRenderer.js';
+import { EventRegistry } from '../events/EventRegistry.js';
+import { EventBus, EventBusEntry } from '../events/EventBus.js';
 
 export class Router {
     #navTree;
-    #renderer;
+    #routerRenderer;
+    #modules;
 
-    constructor(appRenderer, errorConfig) {
-        this.#renderer = {
-            router: new RouterRenderer(appRenderer),
-            app: appRenderer
+    constructor(rootElem, systemEventBus, errorConfig) {
+        if (!(systemEventBus instanceof EventBus)) throw new Error('Failed to initialize Router: systemEventBus must be an instance of EventBus');
+        this.#modules = {
+            appRenderer: new AppRenderer(rootElem, new EventBusEntry(systemEventBus, ['UI:Deleted'])),
+            eventRegistry: new EventRegistry(systemEventBus, new EventBusEntry(systemEventBus, null, ['UI:Deleted'])),
+            eventBus: new EventBus(),
         };
         this.#navTree = new RouterTree(errorConfig);
+        this.#routerRenderer = new RouterRenderer(Object.freeze(this.#modules));
 
         window.addEventListener('popstate', (e) => {
             this.navigateTo(window.location.pathname, false, e.state);
@@ -51,6 +58,6 @@ export class Router {
             history.pushState(entryData, '', path);
         }
 
-        this.#renderer.router.renderMain(packagedData, entryData);
+        this.#routerRenderer.renderMain(packagedData, entryData);
     }
 }
