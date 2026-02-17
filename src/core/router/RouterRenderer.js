@@ -1,18 +1,13 @@
-import { AppRenderer } from './../renderer/AppRenderer.js';
-
 export class RouterRenderer {
-    #appRenderer;
+    #modules;
 
-    constructor(appRenderer) {
-        if (!(appRenderer instanceof AppRenderer)) throw new Error('Invalid');
-        this.#appRenderer = appRenderer;
+    constructor(modules) {
+        this.#modules = modules;
     }
 
-    renderMain(data) {
-        this.#appRenderer.renderContainer(data.html);
-    }
-
-    renderElement(data) {
-        this.#appRenderer.appendTemplate(data.html);
+    renderMain(data, entryData) {
+        this.#modules.eventRegistry.clearAll();
+        this.#modules.eventBus.clearAll();
+        data.controller(this.#modules, data, entryData);
     }
 }
