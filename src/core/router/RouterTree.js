@@ -10,7 +10,11 @@ export class RouterTree {
         this.#tree.appendChild(null, this.#packageData('root', {
             html: null,
             css: null,
-            js: null
+            js: null,
+        }, {
+            isContainer: false,
+            valueName: null,
+            segmentCount: null
         }));
 
         if (typeof errorConfig === 'object') {
@@ -36,6 +40,7 @@ export class RouterTree {
     }
 
     #packageData(segmentName, data, wildCardInfo) {
+        console.log(wildCardInfo);
         return {
             segmentName,
             html: data.html,
