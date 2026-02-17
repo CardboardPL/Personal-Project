@@ -1,9 +1,11 @@
 export class AppRenderer {
     #rootElem;
+    #systemEventBus;
     
-    constructor(rootElem) {
+    constructor(rootElem, systemEventBus) {
         this.#validateRootElem(rootElem);
         this.#rootElem = rootElem;
+        this.#systemEventBus = systemEventBus;
     }
 
     #validateRootElem(rootElem) {
@@ -55,5 +57,14 @@ export class AppRenderer {
 
     appendTemplateAfter(selector, template) {
         this.#mountTemplate(this.#rootElem.querySelector(selector), template, 'afterend');
+    }
+
+    deleteElement(selector) {
+        if (typeof selector !== 'string') throw new Error(`Failed to delete element: expected selector to be a string but received ${typeof selector}`);
+        const elemToBeDeleted = this.#rootElem.querySelector(selector);
+        if (elemToBeDeleted) {
+            elemToBeDeleted.remove();
+            this.#systemEventBus.publish('UI:Deleted', elemToBeDeleted);
+        }
     }
 }
