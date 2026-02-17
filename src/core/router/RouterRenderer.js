@@ -5,9 +5,9 @@ export class RouterRenderer {
         this.#modules = modules;
     }
 
-    renderMain(data, entryData) {
+    renderMain(packagedData, entryData) {
         this.#modules.eventRegistry.clearAll();
         this.#modules.eventBus.clearAll();
-        data.controller(this.#modules, data, entryData);
+        packagedData.controller(this.#modules, packagedData.data, entryData);
     }
 }
