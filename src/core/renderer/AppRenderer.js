@@ -6,6 +6,18 @@ export class AppRenderer {
         this.#validateRootElem(rootElem);
         this.#rootElem = rootElem;
         this.#systemEventBus = systemEventBus;
+
+        this.#systemEventBus.subscribe('UI:ListenerPresence', (payload) => {
+            const [ listenerPresence, elem ] = payload;
+            if (listenerPresence) {
+                const orphanedElements = [];
+                for (const child of elem.children) {
+                    orphanedElements.push(child);
+                }
+
+                this.#systemEventBus.publish('UI:Overwritten', orphanedElements);
+            }
+        });
     }
 
     #validateRootElem(rootElem) {
@@ -31,6 +43,10 @@ export class AppRenderer {
         if (typeof template !== 'string') throw new Error('Template must be of type string.');
     }
 
+    #publishOverwrittenChildren(elem) {
+        this.#systemEventBus.publish('UI:RequestListenerPresence', elem);
+    }
+
     #mountTemplate(elem, template, pos) {
         if (!elem) throw new Error('The element passed must be a valid HTML element.');
 
@@ -40,6 +56,7 @@ export class AppRenderer {
 
     renderContainer(template) {
         this.#validateTemplate(template);
+        this.#publishOverwrittenChildren(this.#rootElem);
         this.#rootElem.innerHTML = template;
     }
 
@@ -57,6 +74,15 @@ export class AppRenderer {
 
     appendTemplateAfter(selector, template) {
         this.#mountTemplate(this.#rootElem.querySelector(selector), template, 'afterend');
+    }
+
+    overwriteTemplateInMain(selector, template) {
+        if (typeof selector !== 'string') throw new Error(`Failed to overwrite element content: expected selector to be a string but received ${typeof selector}`);
+        this.#validateTemplate(template);
+        const elemToBeOverwritten = this.#rootElem.querySelector(selector);
+        if (!elemToBeOverwritten) throw new Error('Failed to overwrite element: element doesn\'t exist');
+        this.#publishOverwrittenChildren(elemToBeOverwritten);
+        elemToBeOverwritten.innerHTML = template;
     }
 
     deleteElement(selector) {
