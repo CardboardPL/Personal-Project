@@ -8,17 +8,35 @@ export class EventRegistry {
 
     constructor(eventBus) {
         this.#listeners = new Map();
-        eventBus.subscribe('UI:Deleted', (parent) => {
-            const queue = new Queue().enqueue(parent);
-
-            for (const elem of queue.consume()) {
-                if (this.#listeners.has(elem)) this.#listeners.delete(elem);
-                
-                for (const child of elem.children) {
-                    queue.enqueue(child);
-                }
-            }
+        eventBus.subscribe('UI:Overwritten', (orphanedElements) => {
+            this.#removeElementReferences(orphanedElements);
         });
+        eventBus.subscribe('UI:Deleted', (parent) => {
+            this.#removeElementReferences([parent]);
+        });
+        eventBus.subscribe('UI:RequestListenerPresence', (elem => {
+            eventBus.publish('UI:ListenerPresence', [this.#listeners.size > 0, elem]);
+        }));
+    }
+
+    #removeElementReferences(elemArr) {
+        if (this.#listeners.size === 0) return;
+        // Queue initial elements
+        const queue = new Queue();
+
+        for (const elem of elemArr) {
+            queue.enqueue(elem);
+        }
+
+        // Check if there are elements registered
+        for (const elem of queue.consume()) {
+            if (this.#listeners.has(elem)) this.#listeners.delete(elem);
+            
+            // Enqueue the children of processed elements
+            for (const child of elem.children) {
+                queue.enqueue(child);
+            }
+        }
     }
 
     addEventListener(element, event, handler) {
