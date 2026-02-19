@@ -12,8 +12,8 @@ export class Router {
     constructor(rootElem, systemEventBus, errorConfig) {
         if (!(systemEventBus instanceof EventBus)) throw new Error('Failed to initialize Router: systemEventBus must be an instance of EventBus');
         this.#modules = {
-            appRenderer: new AppRenderer(rootElem, new EventBusEntry(systemEventBus, ['UI:Deleted'])),
-            eventRegistry: new EventRegistry(systemEventBus, new EventBusEntry(systemEventBus, null, ['UI:Deleted'])),
+            appRenderer: new AppRenderer(rootElem, new EventBusEntry(systemEventBus, ['UI:RequestListenerPresence', 'UI:Overwritten', 'UI:Deleted'], ['UI:ListenerPresence'])),
+            eventRegistry: new EventRegistry(systemEventBus, new EventBusEntry(systemEventBus, ['UI:ListenerPresence'], ['UI:RequestListenerPresence', 'UI:Overwritten', 'UI:Deleted'])),
             eventBus: new EventBus(),
         };
         this.#navTree = new RouterTree(errorConfig);
