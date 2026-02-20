@@ -58,13 +58,15 @@ export class IdTree {
     /** Removes the IDs of a given subtree from the registry.
      * @private
      * @param {IdTreeNode} startNode - The root of the subtree being removed.
+     * @param {Function} [handler] - A function that accepts a node during the deletion process
      */
-    #removeNodesFromMap(startNode) {
+    #removeNodesFromMap(startNode, handler) {
         const toProcess = new Queue();
         this.#registry.removeItem(startNode.id);
         toProcess.enqueue(startNode);
 
         for (const node of toProcess.consume()) {
+            handler(node);
             for (const child of node.children) {
                 this.#registry.removeItem(child.id);
                 toProcess.enqueue(child);
@@ -238,9 +240,11 @@ export class IdTree {
 
     /** Deletes a subtree given its root.
      * @public
-     * @param {any} nodeId - The ID of the root of the subtree. 
+     * @param {any} nodeId - The ID of the root of the subtree.
+     * @param {Function} [handler] - A function that accepts a node during the deletion process
      */
-    deleteSubtree(nodeId) {
+    deleteSubtree(nodeId, handler) {
+        if (handler != null && typeof handler !== 'function') throw new Error('Aborted Subtree Deletion Process: Invalid handler');
         const node = this.#retrieveNode(nodeId);
         if (!node) throw new Error('Aborted Subtree Deletion Process: Node doesn\'t exist in the tree.');
 
@@ -258,7 +262,7 @@ export class IdTree {
             node.parent = null;
         }
 
-        this.#removeNodesFromMap(node);
+        this.#removeNodesFromMap(node, handler);
     }
 }
 
