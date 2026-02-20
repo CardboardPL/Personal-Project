@@ -7,15 +7,15 @@ export class AppRenderer {
         this.#rootElem = rootElem;
         this.#systemEventBus = systemEventBus;
 
-        this.#systemEventBus.subscribe('UI:ListenerPresence', (payload) => {
-            const [ listenerPresence, elem ] = payload;
-            if (listenerPresence) {
+        this.#systemEventBus.subscribe('UI:ListenerCleanupResponse', (payload) => {
+            const [ listenerCleanupResponse, elem ] = payload;
+            if (listenerCleanupResponse) {
                 const orphanedElements = [];
                 for (const child of elem.children) {
                     orphanedElements.push(child);
                 }
 
-                this.#systemEventBus.publish('UI:Overwritten', orphanedElements);
+                this.#systemEventBus.publish('UI:ListenerCleanup', orphanedElements);
             }
         });
     }
@@ -44,7 +44,8 @@ export class AppRenderer {
     }
 
     #publishOverwrittenChildren(elem) {
-        this.#systemEventBus.publish('UI:RequestListenerPresence', elem);
+        this.#systemEventBus.publish('UI:RequestListenerCleanup', elem);
+        this.#systemEventBus.publish('UI:Overwritten', null);
     }
 
     #mountTemplate(elem, template, pos) {
