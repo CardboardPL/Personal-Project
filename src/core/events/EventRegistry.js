@@ -8,14 +8,14 @@ export class EventRegistry {
 
     constructor(eventBus) {
         this.#listeners = new Map();
-        eventBus.subscribe('UI:Overwritten', (orphanedElements) => {
+        eventBus.subscribe('UI:ListenerCleanup', (orphanedElements) => {
             this.#removeElementReferences(orphanedElements);
         });
         eventBus.subscribe('UI:Deleted', (parent) => {
             this.#removeElementReferences([parent]);
         });
-        eventBus.subscribe('UI:RequestListenerPresence', (elem => {
-            eventBus.publish('UI:ListenerPresence', [this.#listeners.size > 0, elem]);
+        eventBus.subscribe('UI:RequestListenerCleanup', (elem => {
+            eventBus.publish('UI:ListenerCleanupResponse', [this.#listeners.size > 0, elem]);
         }));
     }
 
