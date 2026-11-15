@@ -66,6 +66,12 @@ export class LinkedList {
     }
 
     prependNode(node) {
+        if (!node || !(node instanceof Node)) throw new Error('Expected node to prepend to the list');
+
+        // Reset pointers;
+        node.prev = null;
+        node.next = null;
+
         const head = this.head;
 
         if (!head) {
@@ -82,6 +88,12 @@ export class LinkedList {
     }
 
     appendNode(node) {
+        if (!node || !(node instanceof Node)) throw new Error('Expected a node to append to the list');
+
+        // Reset pointers
+        node.prev = null;
+        node.next = null;
+
         const tail = this.tail;
 
         if (!tail) {
@@ -142,11 +154,14 @@ export class LinkedList {
      * @returns the inserted node.
      */
     insertBefore(nodeNext, node, nodeInList) {
+        if (!node || !(node instanceof Node)) throw new Error('Expected a node to be inserted');
         if (nodeNext === node) return node;
-
+        
         if (nodeInList) {
             this.#detach(node);
         } else {
+            node.prev = null;
+            node.next = null;
             this.#length++;
         }
 
@@ -181,16 +196,20 @@ export class LinkedList {
     /**
      * Insert a node after a desired node.
      * @public
-     * @param {Node} nodeNext - The node after which 'node' should be inserted. If null, 'node' is appended.
+     * @param {Node} nodePrev - The node after which 'node' should be inserted. If null, 'node' is prepended.
      * @param {Node} node - The node being inserted.
      * @param {Boolean} nodeInList - True if the node is already in this list and must be detached first.
      * @returns the inserted node.
      */
     insertAfter(nodePrev, node, nodeInList) {
-        return this.insertBefore(nodePrev.next, node, nodeInList);
+        return this.insertBefore(nodePrev ? nodePrev.next : this.head, node, nodeInList);
     }
 
     removeTailNode() {
+        if (!this.head) {
+            return null;
+        }
+
         let node = null;
 
         if (this.head === this.tail) {
@@ -204,6 +223,7 @@ export class LinkedList {
         }
 
         this.#length--;
+        node.prev = null;
         return node;
     }
 
