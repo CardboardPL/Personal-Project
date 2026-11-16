@@ -9,28 +9,35 @@ export class LinkedList {
             if (!(head instanceof Node)) {
                 throw new Error('Provide a valid "head" node to create a linked list.');
             }
-            this.#length = this.#countItems(head, null, true);
+            head.prev = null;
+            this.head = head;
+
+            const visited = new Set();
+            let curr = head;
+            let prev = null;
+            while (curr !== null) {
+                if (visited.has(curr)) throw new Error('Circular References detected');
+                if (curr.prev !== prev) throw new Error('Malformed node objects detected');
+                if (curr.next === null) {
+                    this.tail = curr;
+                }
+                visited.add(curr);
+                prev = curr;
+                curr = curr.next;
+                this.#length++;
+            }
         }
     }
 
-    #countItems(start, end, countAndAssign) {
+    #countItems(start, end) {
         let counter = 0;
         let node = start;
-
-        if (countAndAssign) {
-            this.head = start;
-        }
 
         const set = new Set();
         while (node !== end) {
             if (node === null) throw new Error('Unreachable end node.');
             else if (set.has(node)) throw new Error('Circular References Detected.');
             set.add(node);
-
-            if (countAndAssign && end === null) {
-                this.tail = node;
-            }
-
             node = node.next;
             counter++;
         }
@@ -44,16 +51,17 @@ export class LinkedList {
      * @returns the detached node.
      */
     #detach(node) {
-        if (!node.prev && node.next) { // head node
+        if (this.head === node && this.tail === node) {
+            this.head = null;
+            this.tail = null;
+        } else if (this.head === node) {
             this.head = node.next;
             this.head.prev = null;
-        } else if (!node.prev && !node.next) { // single node
-            this.tail = null;
-            this.head = null;
-        } else if (!node.next && node.prev) { // tail node
-            this.tail = this.tail.prev;
+        } else if (this.tail === node) {
+            this.tail = node.prev;
             this.tail.next = null;
-        } else { // middle node
+        } else {
+            if (!node.prev || !node.next) throw new Error('Passed an unlinked foreign node while detaching');
             node.prev.next = node.next;
             node.next.prev = node.prev;
         }
@@ -65,12 +73,16 @@ export class LinkedList {
         return node;
     }
 
-    prependNode(node) {
+    prependNode(node, nodeInList = false) {
         if (!node || !(node instanceof Node)) throw new Error('Expected node to prepend to the list');
-
-        // Reset pointers;
-        node.prev = null;
-        node.next = null;
+        if (nodeInList) {
+            if (node === this.head) return node;
+            this.#detach(node);
+        } else {
+            node.prev = null;
+            node.next = null;
+            this.#length++;
+        }
 
         const head = this.head;
 
@@ -83,16 +95,19 @@ export class LinkedList {
             this.head = node;
         }
 
-        this.#length++;
         return node;
     }
 
-    appendNode(node) {
+    appendNode(node, nodeInList = false) {
         if (!node || !(node instanceof Node)) throw new Error('Expected a node to append to the list');
-
-        // Reset pointers
-        node.prev = null;
-        node.next = null;
+        if (nodeInList) {
+            if (node === this.tail) return node;
+            this.#detach(node);
+        } else {
+            node.prev = null;
+            node.next = null;
+            this.#length++;
+        }
 
         const tail = this.tail;
 
@@ -105,13 +120,45 @@ export class LinkedList {
             this.tail = node;
         }
 
-        this.#length++;
         return node;
     }
 
-    splice(nodePrev, nodeNext, node, affectedNodeCount) {
-        const diff = typeof affectedNodeCount === 'number' ? affectedNodeCount : this.#countItems(nodePrev ? nodePrev.next : null, nodeNext);
+    splice(nodePrev, nodeNext, node, affectedNodeCount = null) {
+        if (!(nodePrev instanceof Node) && nodePrev !== null) throw new Error('Invalid nodePrev argument: nodePrev must be an instance of Node or null');
+        if (!(nodeNext instanceof Node) && nodeNext !== null) throw new Error('Invalid nodeNext argument: nodeNext must be an instance of Node or null');
+        if (!(node instanceof Node) && node !== null) throw new Error('Invalid node argument: node must be an instance of Node or null');
+        if (affectedNodeCount !== null && (!Number.isInteger(affectedNodeCount) || affectedNodeCount < 0)) throw new Error('Invalid affectedNodeCount argument');
 
+        if (!this.head && (nodePrev || nodeNext)) throw new Error('Tried splicing an empty list');
+        const diff = 
+            !nodePrev && !nodeNext ? this.#length : 
+            typeof affectedNodeCount === 'number' ? affectedNodeCount : this.#countItems(nodePrev ? nodePrev.next : this.head, nodeNext);
+
+        // Handle no node case
+        if (!node) {
+            if (!nodePrev) {
+                if (!nodeNext) {
+                    this.head = null;
+                    this.tail = null;
+                } else {
+                    nodeNext.prev = null;
+                    this.head = nodeNext;
+                }
+            } else {
+                if (!nodeNext) {
+                    nodePrev.next = null;
+                    this.tail = nodePrev;
+                } else {
+                    nodePrev.next = nodeNext;
+                    nodeNext.prev = nodePrev;
+                }
+            }
+
+            this.#length -= diff;
+            return null;
+        }
+
+        // Handle one node case
         if (!nodePrev) {
             this.head = node;
             node.prev = null;
@@ -153,7 +200,8 @@ export class LinkedList {
      * @param {Boolean} nodeInList - True if the node is already in this list and must be detached first.
      * @returns the inserted node.
      */
-    insertBefore(nodeNext, node, nodeInList) {
+    insertBefore(nodeNext, node, nodeInList = false) {
+        if (nodeNext !== null && !(nodeNext instanceof Node)) throw new Error('Expected a reference node or null');
         if (!node || !(node instanceof Node)) throw new Error('Expected a node to be inserted');
         if (nodeNext === node) return node;
         
@@ -201,7 +249,7 @@ export class LinkedList {
      * @param {Boolean} nodeInList - True if the node is already in this list and must be detached first.
      * @returns the inserted node.
      */
-    insertAfter(nodePrev, node, nodeInList) {
+    insertAfter(nodePrev, node, nodeInList = false) {
         return this.insertBefore(nodePrev ? nodePrev.next : this.head, node, nodeInList);
     }
 
@@ -233,6 +281,7 @@ export class LinkedList {
      * @returns the removed node.
      */
     removeNode(node) {
+        if (!(node instanceof Node) && node !== null) throw new Error('Tried deleting an invalid node');
         if (!node) return null;
         this.#detach(node);
         this.#length--;
@@ -281,8 +330,9 @@ export class LinkedList {
     *[Symbol.iterator]() {
         let current = this.head;
         while (current) {
+            const next = current.next;
             yield current;
-            current = current.next;
+            current = next;
         }
     }
 }
