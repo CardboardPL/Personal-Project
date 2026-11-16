@@ -1,7 +1,7 @@
 export class SinglyLinkedList {
     #length = 0;
 
-    constructor(head) {
+    constructor(head = null) {
         if (head === null) {
             this.head = null;
             this.tail = null;
@@ -11,9 +11,12 @@ export class SinglyLinkedList {
             }
             this.head = head;
             this.#length = 1;
-    
+            
+            const visited = new Set();
             let curr = head;
             while (curr.next !== null) {
+                if (visited.has(curr)) throw new Error('Circular references detected');
+                visited.add(curr);
                 curr = curr.next;
                 this.#length++;
             }
@@ -62,8 +65,9 @@ export class SinglyLinkedList {
     *[Symbol.iterator]() {
         let curr = this.head;
         while (curr) {
+            const next = curr.next;
             yield curr;
-            curr = curr.next;
+            curr = next;
         }
     }
 }
