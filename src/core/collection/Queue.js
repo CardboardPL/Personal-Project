@@ -13,12 +13,12 @@ export class Queue {
     }
 
     dequeue() {
-        if (!this.queueSize()) return null; 
+        if (!this.queueSize()) return undefined; 
         return this.#linkedList.removeHead().data;
     }
 
     peek() {
-        if (!this.queueSize()) return null; 
+        if (!this.queueSize()) return undefined; 
         return this.#linkedList.peekHead().data;
     }
 
