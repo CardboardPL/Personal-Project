@@ -26,9 +26,13 @@ export class LRUCache {
 
     get(key) {
         const node = this.#map.get(key);
-        if (!node) return null;
+        if (!node) return undefined;
         this.#list.prependNode(node, true);
         return node.data[1];
+    }
+
+    has(key) {
+        return this.#map.has(key);
     }
 
     update(key, data) {
